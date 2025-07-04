@@ -174,23 +174,26 @@ class TideDataCoordinator(DataUpdateCoordinator):
                     hours = int(time_parts[0])
                     minutes = int(time_parts[1])
                     
-                    # Create a naive datetime first
-                    naive_time = datetime.datetime(
+                    # Create a UTC datetime first (API times are in UTC)
+                    utc_time = datetime.datetime(
                         year=now.year,
                         month=now.month,
                         day=now.day,
                         hour=hours,
-                        minute=minutes
+                        minute=minutes,
+                        tzinfo=datetime.timezone.utc
                     )
                     
-                    # Make it timezone-aware
-                    tide_time = dt_util.as_local(naive_time)
+                    # Convert UTC to local timezone
+                    tide_time = dt_util.as_local(utc_time)
                     
                     # Handle case when tide time is past midnight but still part of today's data
                     if tide_time > now + datetime.timedelta(hours=12):
-                        tide_time = dt_util.as_local(naive_time - datetime.timedelta(days=1))
+                        utc_time_prev_day = utc_time - datetime.timedelta(days=1)
+                        tide_time = dt_util.as_local(utc_time_prev_day)
                     elif tide_time < now - datetime.timedelta(hours=12):
-                        tide_time = dt_util.as_local(naive_time + datetime.timedelta(days=1))
+                        utc_time_next_day = utc_time + datetime.timedelta(days=1)
+                        tide_time = dt_util.as_local(utc_time_next_day)
                         
                     tide_points.append((tide_time, height))
                     processed_tide_points.append({
@@ -245,23 +248,26 @@ class TideDataCoordinator(DataUpdateCoordinator):
                     hours = int(time_parts[0])
                     minutes = int(time_parts[1])
                     
-                    # Create a naive datetime first
-                    naive_time = datetime.datetime(
+                    # Create a UTC datetime first (API times are in UTC)
+                    utc_time = datetime.datetime(
                         year=now.year,
                         month=now.month,
                         day=now.day,
                         hour=hours,
-                        minute=minutes
+                        minute=minutes,
+                        tzinfo=datetime.timezone.utc
                     )
                     
-                    # Make it timezone-aware
-                    tide_time = dt_util.as_local(naive_time)
+                    # Convert UTC to local timezone
+                    tide_time = dt_util.as_local(utc_time)
                     
                     # Handle case when tide time is past midnight but still part of today's data
                     if tide_time > now + datetime.timedelta(hours=12):
-                        tide_time = dt_util.as_local(naive_time - datetime.timedelta(days=1))
+                        utc_time_prev_day = utc_time - datetime.timedelta(days=1)
+                        tide_time = dt_util.as_local(utc_time_prev_day)
                     elif tide_time < now - datetime.timedelta(hours=12):
-                        tide_time = dt_util.as_local(naive_time + datetime.timedelta(days=1))
+                        utc_time_next_day = utc_time + datetime.timedelta(days=1)
+                        tide_time = dt_util.as_local(utc_time_next_day)
                     
                     if tide_type == "pleamar" and tide_time >= now:
                         high_tides.append((tide_time, height))
