@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.1.0 (2025-07-05)
+
+### Major Improvements
+- **TRANSLATION**: Complete translation of all Spanish text to English
+  - Updated README dashboard examples from Spanish to English
+  - Translated GitHub issue templates
+  - Translated CHANGELOG entries
+  - Updated plot manager UI text
+- **CONFIG FLOW**: Streamlined configuration process
+  - Removed unnecessary initial modal step
+  - Direct access to station configuration form
+  - Simplified options flow with dropdown station selection
+  - Added "(optional)" indicator for station name field
+- **UI/UX**: Enhanced user experience
+  - Better configuration flow navigation
+  - Improved options management interface
+  - Cleaner GitHub Actions workflow validation
+- **DOCS**: Updated README with preferred dashboard configuration
+  - Added new modern Mushroom card layouts
+  - Improved CSS styling examples
+  - Better organized dashboard examples
+
 ## 1.0.2 (2025-07-05)
 
 ### Improvements
@@ -83,21 +105,21 @@
 
 ## 0.1.2 (2023-07-06)
 
-### Mejoras
-- Eliminación de dependencias innecesarias (matplotlib, numpy, Pillow)
-- Implementación de SVG para mostrar información de mareas en lugar de gráficos generados
-- Adaptación para soportar cambios en el formato de respuesta de la API (mareas/estaciones)
+### Improvements
+- Removal of unnecessary dependencies (matplotlib, numpy, Pillow)
+- SVG implementation to display tide information instead of generated charts
+- Adaptation to support changes in API response format (tides/stations)
 
 ## 0.1.1 (2023-07-05)
 
-### Mejoras
-- Soporte para múltiples estaciones
-- Configuración de intervalo de actualización por estación
-- Flujo de configuración mejorado para añadir/modificar/eliminar estaciones
+### Improvements
+- Support for multiple stations
+- Update interval configuration per station
+- Enhanced configuration flow to add/modify/remove stations
 
 ## 0.1.0 (2023-07-04)
 
-### Características iniciales
-- Integración con la API del IHM para datos de mareas
-- Sensores para altura actual, próxima marea alta y baja
-- Configuración a través de la interfaz de usuario
+### Initial Features
+- Integration with IHM API for tide data
+- Sensors for current height, next high and low tide
+- Configuration through user interface

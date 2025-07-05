@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="200"
+   height="200"
+   viewBox="0 0 200 200"
+   version="1.1"
+   id="svg8">
+  <defs
+     id="defs2" />
+  <g
+     id="layer1">
+    <!-- Círculo de fondo -->
+    <circle
+       style="fill:#0066cc;fill-opacity:0.8;stroke:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round"
+       id="path10"
+       cx="100"
+       cy="100"
+       r="90" />
+    <!-- Olas de marea -->
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:0.9"
+       d="M 20,120 C 35,110 45,130 60,120 C 75,110 85,130 100,120 C 115,110 125,130 140,120 C 155,110 165,130 180,120"
+       id="path12" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:0.7"
+       d="M 20,100 C 35,90 45,110 60,100 C 75,90 85,110 100,100 C 115,90 125,110 140,100 C 155,90 165,110 180,100"
+       id="path14" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:0.5"
+       d="M 20,80 C 35,70 45,90 60,80 C 75,70 85,90 100,80 C 115,70 125,90 140,80 C 155,70 165,90 180,80"
+       id="path16" />
+    <!-- Luna que afecta a las mareas -->
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round"
+       id="path18"
+       cx="150"
+       cy="50"
+       r="20" />
+    <!-- Sombra de la luna -->
+    <path
+       style="fill:#0066cc;fill-opacity:0.6;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 150,30 A 20,20 0 0 0 150,70 A 18,18 0 0 1 150,34 A 18,18 0 0 1 150,30 z"
+       id="path20" />
+  </g>
+</svg>

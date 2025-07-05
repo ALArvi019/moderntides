@@ -118,26 +118,26 @@ elements:
     style:
       background-color: rgba(0, 0, 0, 0.8)
       color: white
-      font-size: 16px
-      line-height: 30px
-      padding: 5px 15px
-      border-radius: 15px
+      font-size: 13px
+      line-height: 0px
+      padding: 1px 5px
+      border-radius: 10px
       pointer-events: none
       font-weight: bold
-      left: 10px
+      left: 40px
       top: 10px
     type: state-label
   - entity: sensor.STATION_NAME_current_tide_height
     style:
       background-color: rgba(0, 100, 200, 0.8)
       color: white
-      font-size: 14px
-      line-height: 30px
-      padding: 5px 15px
-      border-radius: 15px
+      font-size: 13px
+      line-height: 0px
+      padding: 1px 5px
+      border-radius: 10px
       pointer-events: none
       font-weight: bold
-      right: 10px
+      right: "-70px"
       top: 10px
     prefix: "Current: "
     suffix: " m"
@@ -146,28 +146,28 @@ elements:
     style:
       background-color: rgba(0, 150, 0, 0.8)
       color: white
-      font-size: 12px
-      line-height: 25px
-      padding: 3px 10px
+      font-size: 13px
+      line-height: 0px
+      padding: 1px 5px
       border-radius: 10px
       pointer-events: none
       font-weight: bold
-      right: 10px
-      top: 55px
+      right: "-97px"
+      top: 30px
     prefix: "↑ "
     type: state-label
   - entity: sensor.STATION_NAME_next_low_tide_time
     style:
       background-color: rgba(200, 0, 0, 0.8)
       color: white
-      font-size: 12px
-      line-height: 25px
-      padding: 3px 10px
+      font-size: 13px
+      line-height: 0px
+      padding: 1px 5px
       border-radius: 10px
       pointer-events: none
       font-weight: bold
-      right: 10px
-      top: 90px
+      right: "-97px"
+      top: 50px
     prefix: "↓ "
     type: state-label
 ```
@@ -189,7 +189,138 @@ entities:
     icon: mdi:arrow-down-bold
 ```
 
-### 4. Mushroom Cards (Custom Component)
+### 4. Panel con configuración preferida
+
+Configuración recomendada para un panel moderno y funcional:
+
+```yaml
+type: vertical-stack
+title: Tides at STATION_NAME
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-template-card
+        primary: Current Tide
+        secondary: "{{ states('sensor.STATION_NAME_current_tide_height') }} m"
+        icon: mdi:waves
+        icon_color: blue
+        layout: vertical
+        fill_container: true
+        tap_action:
+          action: more-info
+          entity: sensor.STATION_NAME_current_tide_height
+      - type: custom:mushroom-template-card
+        primary: Next High Tide
+        secondary: >-
+          {{ states('sensor.STATION_NAME_next_high_tide_time') | as_timestamp |
+          timestamp_custom('%H:%M') }}
+        icon: mdi:arrow-up-bold
+        icon_color: green
+        layout: vertical
+        fill_container: true
+        tap_action:
+          action: more-info
+          entity: sensor.STATION_NAME_next_high_tide_time
+      - type: custom:mushroom-template-card
+        primary: Next Low Tide
+        secondary: >-
+          {{ states('sensor.STATION_NAME_next_low_tide_time') | as_timestamp |
+          timestamp_custom('%H:%M') }}
+        icon: mdi:arrow-down-bold
+        icon_color: red
+        layout: vertical
+        fill_container: true
+        tap_action:
+          action: more-info
+          entity: sensor.STATION_NAME_next_low_tide_time
+  - type: picture-elements
+    camera_image: camera.STATION_NAME_tide_plot
+    style: |
+      ha-card {
+        border-radius: 16px;
+        overflow: hidden;
+        margin-top: 16px;
+      }
+    elements:
+      - entity: sensor.STATION_NAME_tide_station_info
+        style:
+          background-color: rgba(0, 0, 0, 0.8)
+          color: white
+          font-size: 13px
+          line-height: 0px
+          padding: 1px 5px
+          border-radius: 10px
+          pointer-events: none
+          font-weight: bold
+          left: 40px
+          top: 10px
+        type: state-label
+      - entity: sensor.STATION_NAME_current_tide_height
+        style:
+          background-color: rgba(0, 100, 200, 0.8)
+          color: white
+          font-size: 13px
+          line-height: 0px
+          padding: 1px 5px
+          border-radius: 10px
+          pointer-events: none
+          font-weight: bold
+          right: "-70px"
+          top: 10px
+        prefix: "Current: "
+        suffix: " m"
+        type: state-label
+      - entity: sensor.STATION_NAME_next_high_tide_time
+        style:
+          background-color: rgba(0, 150, 0, 0.8)
+          color: white
+          font-size: 13px
+          line-height: 0px
+          padding: 1px 5px
+          border-radius: 10px
+          pointer-events: none
+          font-weight: bold
+          right: "-97px"
+          top: 30px
+        prefix: "↑ "
+        type: state-label
+      - entity: sensor.STATION_NAME_next_low_tide_time
+        style:
+          background-color: rgba(200, 0, 0, 0.8)
+          color: white
+          font-size: 13px
+          line-height: 0px
+          padding: 1px 5px
+          border-radius: 10px
+          pointer-events: none
+          font-weight: bold
+          right: "-97px"
+          top: 50px
+        prefix: "↓ "
+        type: state-label
+  - type: custom:mushroom-chips-card
+    style: |
+      ha-card {
+        margin-top: 16px;
+      }
+    chips:
+      - type: entity
+        entity: sensor.STATION_NAME_next_high_tide_time
+        icon: mdi:arrow-up-bold
+        icon_color: green
+        content_info: state
+        tap_action:
+          action: more-info
+      - type: entity
+        entity: sensor.STATION_NAME_next_low_tide_time
+        icon: mdi:arrow-down-bold
+        icon_color: red
+        content_info: state
+        tap_action:
+          action: more-info
+```
+
+### 5. Mushroom Cards (Custom Component)
 
 If you have the [Mushroom Cards](https://github.com/piitaya/lovelace-mushroom) custom component installed, you can create beautiful modern cards:
 
@@ -234,10 +365,9 @@ cards:
   - type: picture-entity
     entity: camera.STATION_NAME_tide_plot
     camera_view: auto
-    aspect_ratio: 16:9
 ```
 
-### 5. Advanced Mushroom Dashboard
+### 6. Advanced Mushroom Dashboard
 
 For a more sophisticated Mushroom layout:
 
@@ -282,10 +412,9 @@ cards:
     camera_view: auto
     show_state: false
     show_name: false
-    aspect_ratio: 16:9
 ```
 
-### 6. Vertical Stack with Chart
+### 7. Vertical Stack with Chart
 
 ```yaml
 type: vertical-stack
@@ -298,7 +427,6 @@ cards:
   - type: picture-entity
     entity: camera.STATION_NAME_tide_plot
     camera_view: auto
-    aspect_ratio: 2:1
   
   - type: horizontal-stack
     cards:
@@ -323,7 +451,7 @@ cards:
             icon: mdi:arrow-down-bold
 ```
 
-### 7. Compact Mobile-Friendly Card
+### 8. Compact Mobile-Friendly Card
 
 ```yaml
 type: picture-elements
@@ -368,7 +496,7 @@ elements:
     type: state-label
 ```
 
-### 8. Multiple Stations Dashboard
+### 9. Multiple Stations Dashboard
 
 ```yaml
 type: grid

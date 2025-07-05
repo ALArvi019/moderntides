@@ -394,7 +394,7 @@ class TidePlotManager:
         labels.append(f'<text x="{width/2}" y="{height - 10}" text-anchor="middle" font-family="Arial" font-size="12" fill="black">Tiempo</text>')
         labels.append(f'''
             <text x="15" y="{height/2}" text-anchor="middle" font-family="Arial" font-size="12" fill="black" 
-                  transform="rotate(-90, 15, {height/2})">Altura de Marea (m)</text>
+                  transform="rotate(-90, 15, {height/2})">Tide Height (m)</text>
         ''')
         
         return labels

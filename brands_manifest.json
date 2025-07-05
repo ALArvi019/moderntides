@@ -1,8 +1,0 @@
-{
-  "domain": "moderntides",
-  "name": "Modern Tides",
-  "documentation": "https://github.com/ALArvi019/moderntides",
-  "dependencies": [],
-  "codeowners": ["@ALArvi019"],
-  "iot_class": "cloud_polling"
-}

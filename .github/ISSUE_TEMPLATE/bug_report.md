@@ -1,38 +1,38 @@
 ---
-name: Reporte de error
-about: Crea un reporte para ayudarnos a mejorar
+name: Bug report
+about: Create a report to help us improve
 title: "[BUG]"
 labels: bug
 assignees: ''
 
 ---
 
-**Describe el error**
-Una descripción clara y concisa del error.
+**Describe the bug**
+A clear and concise description of what the bug is.
 
-**Para reproducir**
-Pasos para reproducir el comportamiento:
-1. Ve a '...'
-2. Haz clic en '....'
-3. Desplázate hasta '....'
-4. Ver error
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
 
-**Comportamiento esperado**
-Una descripción clara y concisa de lo que esperabas que ocurriera.
+**Expected behavior**
+A clear and concise description of what you expected to happen.
 
-**Capturas de pantalla**
-Si es aplicable, añade capturas de pantalla para ayudar a explicar tu problema.
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
 
-**Entorno (por favor, completa la siguiente información):**
- - Versión de Home Assistant: [ej. 2023.9.0]
- - Método de instalación: [ej. HACS, Manual]
- - Tipo de instalación: [ej. Home Assistant OS, Container, Core]
- - Versión de Modern Tides: [ej. 0.1.0]
+**Environment (please complete the following information):**
+ - Home Assistant Version: [e.g. 2023.9.0]
+ - Installation Method: [e.g. HACS, Manual]
+ - Installation Type: [e.g. Home Assistant OS, Container, Core]
+ - Modern Tides Version: [e.g. 0.1.0]
 
-**Información adicional**
-Añade aquí cualquier otra información sobre el problema.
+**Additional context**
+Add any other context about the problem here.
 
 **Logs**
 ```
-Pega aquí los logs relevantes
+Paste relevant logs here
 ```
