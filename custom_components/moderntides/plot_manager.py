@@ -4,12 +4,12 @@ import logging
 import math
 import base64
 import io
-import json
 from typing import Any, Dict, List, Optional, Tuple
 
 from homeassistant.util import dt as dt_util
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class TidePlotManager:
     """Class to manage SVG-based tide plots."""
@@ -213,7 +213,7 @@ class TidePlotManager:
                 prev_height = predictions[i]['height']
                 curr_height = predictions[i]['height']
                 next_height = predictions[i + 1]['height']
-            if i == (len(predictions) - 1):
+            elif i == (len(predictions) - 1):
                 prev_height = predictions[i - 1]['height']
                 curr_height = predictions[i]['height']
                 next_height = predictions[i]['height']
