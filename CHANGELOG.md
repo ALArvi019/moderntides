@@ -1,5 +1,59 @@
 # Changelog
 
+## 1.1.1 (2025-07-06)
+
+### New Features
+- **DARK MODE**: Added dark mode tide plot visualization
+  - New camera entity: `camera.STATION_NAME_tide_plot_dark`
+  - Dark-themed color palette optimized for dark UI interfaces
+  - Background: Dark gray (#1e1e1e) with light text and contrasting colors
+  - Both light and dark mode plots are generated automatically
+  - Separate camera entities for each mode allow flexible dashboard design
+
+### Dashboard Examples
+- **NEW EXAMPLE**: Added comprehensive weather & tides dashboard (Example 7)
+  - Combines Clock Weather Card with tide visualization
+  - Interactive overlays with real-time data
+  - Mushroom cards for tide and wind information
+  - Navigation chips for quick access to tide times
+  - Complete weather integration with color-coded indicators
+- **EXAMPLES REORGANIZATION**: Restructured dashboard examples for better accessibility
+  - Moved all YAML examples from main README to `/examples` folder
+  - Created individual folders for each example with detailed documentation
+  - Added preview images and usage instructions for each example
+  - Updated main README with gallery/table of examples with thumbnails
+- **EXAMPLES CLEANUP**: Removed compact mobile-friendly example (poor layout)
+- **EXAMPLES STANDARDIZATION**: Updated multiple stations example to use STATION_NAME placeholders
+  - Replaced hardcoded station names (cadiz, barcelona, etc.) with generic placeholders
+  - Improved consistency across all examples
+  - Made examples more language-agnostic and inclusive
+
+### Bug Fixes
+- **HASSFEST**: Removed invalid manifest fields (`homeassistant` and `icon`) to fix validation errors
+- **CONFIG**: Added required `CONFIG_SCHEMA = cv.config_entry_only_config_schema` to `__init__.py`
+- **VALIDATION**: Fixed GitHub Actions hassfest validation issues that were preventing integration validation
+- **PLOT**: Fixed high and low tide extremes generation algorithm (#4)
+  - Improved detection of tide extremes (high/low points)
+  - Fixed forgotten elif condition in extremes calculation
+  - Enhanced plot accuracy for tide prediction visualization
+- **LAYOUT**: Fixed comprehensive weather dashboard layout issue
+  - Changed from `type: grid` to `type: vertical-stack` to prevent content clustering on left side
+  - Improved responsive design and full-width utilization
+
+### Technical Details
+- Added dual plot generation: light mode (`plot.svg`) and dark mode (`plot_dark.svg`)
+- Enhanced TidePlotManager with configurable color schemes for light/dark themes
+- Created separate camera entities for each visualization mode
+- Dark mode uses green tide lines (#4CAF50), orange high tides (#FF5722), blue low tides (#2196F3)
+- Improved plot styling with mode-specific text and background colors
+- Removed `homeassistant` field from manifest.json (not allowed in Home Assistant manifests)
+- Removed `icon` field from manifest.json (not allowed in Home Assistant manifests)
+- Added proper CONFIG_SCHEMA import and definition for config-entry-only integrations
+- Improved tide extremes calculation in plot_manager.py
+- Maintained all existing functionality while fixing validation compliance
+- Created comprehensive example structure with preview images and detailed READMEs
+- Standardized all examples to use STATION_NAME placeholder pattern
+
 ## 1.1.0 (2025-07-05)
 
 ### Major Improvements

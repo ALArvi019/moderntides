@@ -16,10 +16,12 @@ A modern Home Assistant custom integration that provides real-time tide informat
 
 - **Real-time tide data** from official Spanish maritime institute
 - **Beautiful tide charts** as camera entities (SVG format)
+- **Dual visualization modes**: Light and dark theme support with automatic dual camera entities
 - **Multiple sensors** for current height and next tide times
 - **Easy configuration** through the UI
 - **Automatic updates** every 30 minutes
 - **Support for multiple stations** simultaneously
+- **Modern UI integration** with optimized color palettes for both light and dark interfaces
 
 ## Installation
 
@@ -79,458 +81,66 @@ After adding a station, you'll have access to these entities (replace `STATION_N
 - `sensor.STATION_NAME_current_tide_height` - Current tide height in meters
 - `sensor.STATION_NAME_next_high_tide_time` - Next high tide time
 - `sensor.STATION_NAME_next_low_tide_time` - Next low tide time
-- `camera.STATION_NAME_tide_plot` - Tide chart visualization
+- `camera.STATION_NAME_tide_plot` - Tide chart visualization (light mode)
+- `camera.STATION_NAME_tide_plot_dark` - Tide chart visualization (dark mode)
+
+### Camera Entities
+
+Two camera entities are created for each station to provide flexible visualization options:
+
+- **Light Mode Camera** (`camera.STATION_NAME_tide_plot`): Traditional white background with blue tide curves, perfect for light-themed dashboards
+- **Dark Mode Camera** (`camera.STATION_NAME_tide_plot_dark`): Dark background (#1e1e1e) with green tide curves and enhanced contrast, optimized for dark-themed interfaces
+
+### Visual Specifications
+
+#### Light Mode (`camera.STATION_NAME_tide_plot`)
+- **Background**: White (#FFFFFF)
+- **Tide curve**: Cornflower blue (#6495ED)
+- **Fill area**: Light blue with 30% opacity
+- **Grid lines**: Light gray (#D3D3D3)
+- **High tide markers**: Red (#FF0000)
+- **Low tide markers**: Blue (#0000FF)
+- **Text**: Black (#000000)
+
+#### Dark Mode (`camera.STATION_NAME_tide_plot_dark`)
+- **Background**: Dark gray (#1E1E1E)
+- **Tide curve**: Green (#4CAF50)
+- **Fill area**: Green with 20% opacity
+- **Grid lines**: Dark gray (#404040)
+- **High tide markers**: Orange (#FF5722)
+- **Low tide markers**: Light blue (#2196F3)
+- **Text**: White (#FFFFFF) and light gray (#CCCCCC)
+
+Both visualizations are generated as scalable SVG files and update automatically with new tide data.
 
 ## Dashboard Examples
 
-Here are several examples of how to display tide information in your Home Assistant dashboards:
+Explore our collection of dashboard examples to get the most out of your Modern Tides integration. Each example includes detailed instructions, YAML code, and visual previews.
 
-### 1. Basic Entity Card
+| Example | Description | Features |
+|---------|-------------|----------|
+| [![Basic Entity Card](examples/01-basic-entity-card/preview.png)](examples/01-basic-entity-card/) | **[Basic Entity Card](examples/01-basic-entity-card/)** | Simple list format with all tide information |
+| [![Picture Elements](examples/02-picture-elements-overlays/preview.png)](examples/02-picture-elements-overlays/) | **[Picture Elements with Overlays](examples/02-picture-elements-overlays/)** | Interactive overlays on tide chart |
+| [![Glance Card](examples/03-glance-card/preview.png)](examples/03-glance-card/) | **[Glance Card](examples/03-glance-card/)** | Compact three-column view |
+| [![Mushroom Cards](examples/04-mushroom-cards/preview.png)](examples/04-mushroom-cards/) | **[Mushroom Cards](examples/04-mushroom-cards/)** | Modern design with Mushroom components |
+| [![Preferred Panel](examples/05-preferred-panel-configuration/preview.png)](examples/05-preferred-panel-configuration/) | **[Preferred Panel Configuration](examples/05-preferred-panel-configuration/)** | Most informative and visually appealing setup |
+| [![Dark Mode](examples/06-dark-mode-visualization/preview.png)](examples/06-dark-mode-visualization/) | **[Dark Mode Visualization](examples/06-dark-mode-visualization/)** | Automatic theme switching and dual cameras |
+| [![Comprehensive Weather](examples/07-comprehensive-weather-tides/preview.png)](examples/07-comprehensive-weather-tides/) | **[Comprehensive Weather & Tides](examples/07-comprehensive-weather-tides/)** | Complete weather and tide monitoring dashboard |
+| [![Multiple Stations](examples/08-multiple-stations/preview.png)](examples/08-multiple-stations/) | **[Multiple Stations](examples/08-multiple-stations/)** | Side-by-side comparison dashboard |
 
-```yaml
-type: entities
-title: Tide Information - STATION_NAME
-entities:
-  - entity: sensor.STATION_NAME_tide_station_info
-    name: Station
-  - entity: sensor.STATION_NAME_current_tide_height
-    name: Current Height
-    icon: mdi:waves
-  - type: divider
-  - entity: sensor.STATION_NAME_next_high_tide_time
-    name: Next High Tide
-    icon: mdi:arrow-up-bold
-  - entity: sensor.STATION_NAME_next_low_tide_time
-    name: Next Low Tide
-    icon: mdi:arrow-down-bold
-  - type: divider
-  - entity: camera.STATION_NAME_tide_plot
-    name: Tide Chart
-```
+### Quick Start
 
-### 2. Picture Elements Card with Overlays
+1. Choose an example that fits your needs
+2. Click on the example link to view detailed instructions
+3. Replace `STATION_NAME` with your actual station name (e.g., `cadiz`, `barcelona`)
+4. Copy the provided YAML code to your Home Assistant dashboard
+5. Enjoy your beautiful tide visualizations!
 
-```yaml
-type: picture-elements
-camera_image: camera.STATION_NAME_tide_plot
-elements:
-  - entity: sensor.STATION_NAME_tide_station_info
-    style:
-      background-color: rgba(0, 0, 0, 0.8)
-      color: white
-      font-size: 13px
-      line-height: 0px
-      padding: 1px 5px
-      border-radius: 10px
-      pointer-events: none
-      font-weight: bold
-      left: 40px
-      top: 10px
-    type: state-label
-  - entity: sensor.STATION_NAME_current_tide_height
-    style:
-      background-color: rgba(0, 100, 200, 0.8)
-      color: white
-      font-size: 13px
-      line-height: 0px
-      padding: 1px 5px
-      border-radius: 10px
-      pointer-events: none
-      font-weight: bold
-      right: "-70px"
-      top: 10px
-    prefix: "Current: "
-    suffix: " m"
-    type: state-label
-  - entity: sensor.STATION_NAME_next_high_tide_time
-    style:
-      background-color: rgba(0, 150, 0, 0.8)
-      color: white
-      font-size: 13px
-      line-height: 0px
-      padding: 1px 5px
-      border-radius: 10px
-      pointer-events: none
-      font-weight: bold
-      right: "-97px"
-      top: 30px
-    prefix: "↑ "
-    type: state-label
-  - entity: sensor.STATION_NAME_next_low_tide_time
-    style:
-      background-color: rgba(200, 0, 0, 0.8)
-      color: white
-      font-size: 13px
-      line-height: 0px
-      padding: 1px 5px
-      border-radius: 10px
-      pointer-events: none
-      font-weight: bold
-      right: "-97px"
-      top: 50px
-    prefix: "↓ "
-    type: state-label
-```
+### Requirements
 
-### 3. Glance Card
-
-```yaml
-type: glance
-title: Tides Overview
-entities:
-  - entity: sensor.STATION_NAME_current_tide_height
-    name: Current
-    icon: mdi:waves
-  - entity: sensor.STATION_NAME_next_high_tide_time
-    name: Next High
-    icon: mdi:arrow-up-bold
-  - entity: sensor.STATION_NAME_next_low_tide_time
-    name: Next Low
-    icon: mdi:arrow-down-bold
-```
-
-### 4. Panel con configuración preferida
-
-Configuración recomendada para un panel moderno y funcional:
-
-```yaml
-type: vertical-stack
-title: Tides at STATION_NAME
-cards:
-  - type: horizontal-stack
-    cards:
-      - type: custom:mushroom-template-card
-        primary: Current Tide
-        secondary: "{{ states('sensor.STATION_NAME_current_tide_height') }} m"
-        icon: mdi:waves
-        icon_color: blue
-        layout: vertical
-        fill_container: true
-        tap_action:
-          action: more-info
-          entity: sensor.STATION_NAME_current_tide_height
-      - type: custom:mushroom-template-card
-        primary: Next High Tide
-        secondary: >-
-          {{ states('sensor.STATION_NAME_next_high_tide_time') | as_timestamp |
-          timestamp_custom('%H:%M') }}
-        icon: mdi:arrow-up-bold
-        icon_color: green
-        layout: vertical
-        fill_container: true
-        tap_action:
-          action: more-info
-          entity: sensor.STATION_NAME_next_high_tide_time
-      - type: custom:mushroom-template-card
-        primary: Next Low Tide
-        secondary: >-
-          {{ states('sensor.STATION_NAME_next_low_tide_time') | as_timestamp |
-          timestamp_custom('%H:%M') }}
-        icon: mdi:arrow-down-bold
-        icon_color: red
-        layout: vertical
-        fill_container: true
-        tap_action:
-          action: more-info
-          entity: sensor.STATION_NAME_next_low_tide_time
-  - type: picture-elements
-    camera_image: camera.STATION_NAME_tide_plot
-    style: |
-      ha-card {
-        border-radius: 16px;
-        overflow: hidden;
-        margin-top: 16px;
-      }
-    elements:
-      - entity: sensor.STATION_NAME_tide_station_info
-        style:
-          background-color: rgba(0, 0, 0, 0.8)
-          color: white
-          font-size: 13px
-          line-height: 0px
-          padding: 1px 5px
-          border-radius: 10px
-          pointer-events: none
-          font-weight: bold
-          left: 40px
-          top: 10px
-        type: state-label
-      - entity: sensor.STATION_NAME_current_tide_height
-        style:
-          background-color: rgba(0, 100, 200, 0.8)
-          color: white
-          font-size: 13px
-          line-height: 0px
-          padding: 1px 5px
-          border-radius: 10px
-          pointer-events: none
-          font-weight: bold
-          right: "-70px"
-          top: 10px
-        prefix: "Current: "
-        suffix: " m"
-        type: state-label
-      - entity: sensor.STATION_NAME_next_high_tide_time
-        style:
-          background-color: rgba(0, 150, 0, 0.8)
-          color: white
-          font-size: 13px
-          line-height: 0px
-          padding: 1px 5px
-          border-radius: 10px
-          pointer-events: none
-          font-weight: bold
-          right: "-97px"
-          top: 30px
-        prefix: "↑ "
-        type: state-label
-      - entity: sensor.STATION_NAME_next_low_tide_time
-        style:
-          background-color: rgba(200, 0, 0, 0.8)
-          color: white
-          font-size: 13px
-          line-height: 0px
-          padding: 1px 5px
-          border-radius: 10px
-          pointer-events: none
-          font-weight: bold
-          right: "-97px"
-          top: 50px
-        prefix: "↓ "
-        type: state-label
-  - type: custom:mushroom-chips-card
-    style: |
-      ha-card {
-        margin-top: 16px;
-      }
-    chips:
-      - type: entity
-        entity: sensor.STATION_NAME_next_high_tide_time
-        icon: mdi:arrow-up-bold
-        icon_color: green
-        content_info: state
-        tap_action:
-          action: more-info
-      - type: entity
-        entity: sensor.STATION_NAME_next_low_tide_time
-        icon: mdi:arrow-down-bold
-        icon_color: red
-        content_info: state
-        tap_action:
-          action: more-info
-```
-
-### 5. Mushroom Cards (Custom Component)
-
-If you have the [Mushroom Cards](https://github.com/piitaya/lovelace-mushroom) custom component installed, you can create beautiful modern cards:
-
-```yaml
-type: vertical-stack
-cards:
-  - type: custom:mushroom-title-card
-    title: Tides - STATION_NAME
-    subtitle: Instituto Hidrográfico de la Marina
-  
-  - type: custom:mushroom-template-card
-    primary: Current tide height
-    secondary: "{{ states('sensor.STATION_NAME_current_tide_height') }} m"
-    icon: mdi:waves
-    icon_color: blue
-    tap_action:
-      action: more-info
-      entity: sensor.STATION_NAME_current_tide_height
-  
-  - type: horizontal-stack
-    cards:
-      - type: custom:mushroom-template-card
-        primary: Next high tide
-        secondary: >-
-          {{ states('sensor.STATION_NAME_next_high_tide_time') | as_timestamp | timestamp_custom('%H:%M') }}
-        icon: mdi:arrow-up-bold
-        icon_color: green
-        tap_action:
-          action: more-info
-          entity: sensor.STATION_NAME_next_high_tide_time
-      
-      - type: custom:mushroom-template-card
-        primary: Next low tide
-        secondary: >-
-          {{ states('sensor.STATION_NAME_next_low_tide_time') | as_timestamp | timestamp_custom('%H:%M') }}
-        icon: mdi:arrow-down-bold
-        icon_color: red
-        tap_action:
-          action: more-info
-          entity: sensor.STATION_NAME_next_low_tide_time
-  
-  - type: picture-entity
-    entity: camera.STATION_NAME_tide_plot
-    camera_view: auto
-```
-
-### 6. Advanced Mushroom Dashboard
-
-For a more sophisticated Mushroom layout:
-
-```yaml
-type: vertical-stack
-cards:
-  - type: custom:mushroom-title-card
-    title: "{{ state_attr('sensor.STATION_NAME_tide_station_info', 'friendly_name') }}"
-    subtitle: Real-time tide monitoring
-    title_tap_action:
-      action: none
-    
-  - type: custom:mushroom-entity-card
-    entity: sensor.STATION_NAME_current_tide_height
-    name: Current Tide Height
-    icon: mdi:waves
-    icon_color: blue
-    primary_info: name
-    secondary_info: state
-    tap_action:
-      action: more-info
-    
-  - type: custom:mushroom-chips-card
-    chips:
-      - type: entity
-        entity: sensor.STATION_NAME_next_high_tide_time
-        icon: mdi:arrow-up-bold
-        icon_color: green
-        content_info: state
-        tap_action:
-          action: more-info
-      - type: entity
-        entity: sensor.STATION_NAME_next_low_tide_time
-        icon: mdi:arrow-down-bold
-        icon_color: red
-        content_info: state
-        tap_action:
-          action: more-info
-    
-  - type: picture-entity
-    entity: camera.STATION_NAME_tide_plot
-    camera_view: auto
-    show_state: false
-    show_name: false
-```
-
-### 7. Vertical Stack with Chart
-
-```yaml
-type: vertical-stack
-cards:
-  - type: markdown
-    content: |
-      # Tide Information - STATION_NAME
-      Real-time tide data and predictions
-  
-  - type: picture-entity
-    entity: camera.STATION_NAME_tide_plot
-    camera_view: auto
-  
-  - type: horizontal-stack
-    cards:
-      - type: gauge
-        entity: sensor.STATION_NAME_current_tide_height
-        min: 0
-        max: 4
-        name: Current Height
-        unit: m
-        severity:
-          green: 1.5
-          yellow: 0.5
-          red: 0
-      
-      - type: entities
-        entities:
-          - entity: sensor.STATION_NAME_next_high_tide_time
-            name: Next High Tide
-            icon: mdi:arrow-up-bold
-          - entity: sensor.STATION_NAME_next_low_tide_time
-            name: Next Low Tide
-            icon: mdi:arrow-down-bold
-```
-
-### 8. Compact Mobile-Friendly Card
-
-```yaml
-type: picture-elements
-camera_image: camera.STATION_NAME_tide_plot
-elements:
-  - entity: sensor.STATION_NAME_current_tide_height
-    style:
-      top: 5px
-      right: 5px
-      background-color: rgba(0, 0, 0, 0.8)
-      color: white
-      padding: 5px 10px
-      border-radius: 20px
-      font-size: 12px
-      font-weight: bold
-    prefix: "Now: "
-    suffix: "m"
-    type: state-label
-  
-  - entity: sensor.STATION_NAME_next_high_tide_time
-    style:
-      top: 35px
-      right: 5px
-      background-color: rgba(0, 150, 0, 0.8)
-      color: white
-      padding: 3px 8px
-      border-radius: 15px
-      font-size: 10px
-    prefix: "↑ "
-    type: state-label
-  
-  - entity: sensor.STATION_NAME_next_low_tide_time
-    style:
-      top: 55px
-      right: 5px
-      background-color: rgba(200, 0, 0, 0.8)
-      color: white
-      padding: 3px 8px
-      border-radius: 15px
-      font-size: 10px
-    prefix: "↓ "
-    type: state-label
-```
-
-### 9. Multiple Stations Dashboard
-
-```yaml
-type: grid
-title: Spanish Ports Tides
-columns: 2
-cards:
-  - type: picture-elements
-    camera_image: camera.cadiz_tide_plot
-    elements:
-      - entity: sensor.cadiz_tide_station_info
-        style:
-          bottom: 0
-          left: 0
-          background-color: rgba(0, 0, 0, 0.7)
-          color: white
-          font-size: 14px
-          padding: 10px
-          width: 100%
-        type: state-label
-  
-  - type: picture-elements
-    camera_image: camera.barcelona_tide_plot
-    elements:
-      - entity: sensor.barcelona_tide_station_info
-        style:
-          bottom: 0
-          left: 0
-          background-color: rgba(0, 0, 0, 0.7)
-          color: white
-          font-size: 14px
-          padding: 10px
-          width: 100%
-        type: state-label
-```
+- Modern Tides integration installed and configured
+- For Mushroom card examples: [Mushroom cards](https://github.com/piitaya/lovelace-mushroom) custom component
+- At least one tide station configured
 
 ## Example Automation
 

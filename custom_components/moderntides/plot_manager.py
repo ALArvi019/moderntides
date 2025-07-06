@@ -19,11 +19,13 @@ class TidePlotManager:
         name: str,
         filename: str,
         transparent_background: bool = False,
+        dark_mode: bool = False,
     ):
         """Initialize the plot manager."""
         self._name = name
         self._filename = filename
         self._transparent_background = transparent_background
+        self._dark_mode = dark_mode
 
     def generate_tide_plot(
         self, 
@@ -271,6 +273,38 @@ class TidePlotManager:
         min_height -= height_range * 0.1
         max_height += height_range * 0.1
         
+        # Define color scheme based on mode
+        if self._dark_mode:
+            colors = {
+                'background': '#1e1e1e' if not self._transparent_background else 'none',
+                'grid': '#404040',
+                'tide_line': '#4CAF50',  # Green for dark mode
+                'tide_fill': '#4CAF50',  # Green fill with opacity
+                'tide_fill_opacity': '0.2',
+                'current_marker': '#FFF',  # White marker
+                'current_text': '#FFF',   # White text
+                'high_tide': '#FF5722',   # Orange for high tide
+                'low_tide': '#2196F3',    # Blue for low tide
+                'text': '#FFF',           # White text
+                'title': '#FFF',          # White title
+                'axis_text': '#CCC',      # Light gray for axis text
+            }
+        else:
+            colors = {
+                'background': 'white' if not self._transparent_background else 'none',
+                'grid': 'lightgray',
+                'tide_line': 'cornflowerblue',
+                'tide_fill': 'lightblue',
+                'tide_fill_opacity': '0.3',
+                'current_marker': 'black',
+                'current_text': 'black',
+                'high_tide': 'red',
+                'low_tide': 'blue',
+                'text': 'black',
+                'title': 'black',
+                'axis_text': 'black',
+            }
+        
         # Helper functions for coordinate conversion
         def time_to_x(time_val):
             time_ratio = (time_val - min_time).total_seconds() / (max_time - min_time).total_seconds()
@@ -283,11 +317,11 @@ class TidePlotManager:
         # Start building SVG
         svg_parts = [
             f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">',
-            f'<rect width="{width}" height="{height}" fill="{"none" if self._transparent_background else "white"}"/>',
+            f'<rect width="{width}" height="{height}" fill="{colors["background"]}"/>',
         ]
         
         # Add grid
-        svg_parts.extend(self._generate_grid(margin, plot_width, plot_height, width, height))
+        svg_parts.extend(self._generate_grid(margin, plot_width, plot_height, width, height, colors['grid']))
         
         # Generate tide curve path
         path_points = []
@@ -307,19 +341,19 @@ class TidePlotManager:
             area_points.append(f"{time_to_x(min_time)},{bottom_y}")
             area_path = f"M {area_points[0]} L " + " L ".join(area_points[1:]) + " Z"
             
-            svg_parts.append(f'<path d="{area_path}" fill="lightblue" opacity="0.3"/>')
-            svg_parts.append(f'<path d="{path_data}" stroke="cornflowerblue" stroke-width="2" fill="none"/>')
+            svg_parts.append(f'<path d="{area_path}" fill="{colors["tide_fill"]}" opacity="{colors["tide_fill_opacity"]}"/>')
+            svg_parts.append(f'<path d="{path_data}" stroke="{colors["tide_line"]}" stroke-width="2" fill="none"/>')
         
         # Add current position marker
         if current_height is not None:
             curr_x = time_to_x(current_time)
             curr_y = height_to_y(current_height)
-            svg_parts.append(f'<circle cx="{curr_x}" cy="{curr_y}" r="4" fill="black"/>')
+            svg_parts.append(f'<circle cx="{curr_x}" cy="{curr_y}" r="4" fill="{colors["current_marker"]}"/>')
             
             # Add current time annotation
             curr_label = f'{current_height:.2f}m @ {current_time.strftime("%H:%M")}'
             svg_parts.append(f'''
-                <text x="{curr_x}" y="{curr_y - 15}" text-anchor="middle" font-family="Arial" font-size="12" fill="black">
+                <text x="{curr_x}" y="{curr_y - 15}" text-anchor="middle" font-family="Arial" font-size="12" fill="{colors["current_text"]}">
                     {curr_label}
                 </text>
             ''')
@@ -328,31 +362,40 @@ class TidePlotManager:
         for extreme in extremes:
             ext_x = time_to_x(extreme['time'])
             ext_y = height_to_y(extreme['height'])
-            color = "red" if extreme['type'] == 'high' else "blue"
-            marker = "▲" if extreme['type'] == 'high' else "▼"
+            color = colors["high_tide"] if extreme['type'] == 'high' else colors["low_tide"]
             
             svg_parts.append(f'<circle cx="{ext_x}" cy="{ext_y}" r="4" fill="{color}"/>')
             
             # Add label
             label_y = ext_y - 20 if extreme['type'] == 'high' else ext_y + 25
             ext_label = f"{extreme['height']:.2f}m @ {extreme['time'].strftime('%H:%M')}"
-            svg_parts.append(f'''
-                <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="Arial" font-size="12" 
-                      fill="white" stroke="{color}" stroke-width="3" paint-order="stroke">
-                    {ext_label}
-                </text>
-            ''')
+            
+            # Different text styling for dark vs light mode
+            if self._dark_mode:
+                svg_parts.append(f'''
+                    <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="Arial" font-size="12" 
+                          fill="{colors["text"]}" stroke="{color}" stroke-width="1" paint-order="stroke">
+                        {ext_label}
+                    </text>
+                ''')
+            else:
+                svg_parts.append(f'''
+                    <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="Arial" font-size="12" 
+                          fill="white" stroke="{color}" stroke-width="3" paint-order="stroke">
+                        {ext_label}
+                    </text>
+                ''')
         
         # Add axes labels
         svg_parts.extend(self._generate_axes_labels(
             margin, plot_width, plot_height, width, height,
-            min_time, max_time, min_height, max_height
+            min_time, max_time, min_height, max_height, colors['axis_text']
         ))
         
         # Add title
         svg_parts.append(f'''
-            <text x="{width/2}" y="25" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="black">
-                Predicción de Mareas - {self._name}
+            <text x="{width/2}" y="25" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="{colors["title"]}">
+                Tide Prediction - {self._name}
             </text>
         ''')
         
@@ -360,24 +403,24 @@ class TidePlotManager:
         
         return '\n'.join(svg_parts)
 
-    def _generate_grid(self, margin, plot_width, plot_height, width, height):
+    def _generate_grid(self, margin, plot_width, plot_height, width, height, grid_color="lightgray"):
         """Generate grid lines for the plot."""
         grid_parts = []
         
         # Vertical grid lines (time)
         for i in range(5):
             x = margin + (i * plot_width / 4)
-            grid_parts.append(f'<line x1="{x}" y1="{margin}" x2="{x}" y2="{height - margin}" stroke="lightgray" stroke-width="0.5"/>')
+            grid_parts.append(f'<line x1="{x}" y1="{margin}" x2="{x}" y2="{height - margin}" stroke="{grid_color}" stroke-width="0.5"/>')
         
         # Horizontal grid lines (height)
         for i in range(5):
             y = margin + (i * plot_height / 4)
-            grid_parts.append(f'<line x1="{margin}" y1="{y}" x2="{width - margin}" y2="{y}" stroke="lightgray" stroke-width="0.5"/>')
+            grid_parts.append(f'<line x1="{margin}" y1="{y}" x2="{width - margin}" y2="{y}" stroke="{grid_color}" stroke-width="0.5"/>')
         
         return grid_parts
 
     def _generate_axes_labels(self, margin, plot_width, plot_height, width, height,
-                            min_time, max_time, min_height, max_height):
+                            min_time, max_time, min_height, max_height, text_color="black"):
         """Generate axes labels and ticks."""
         labels = []
         
@@ -388,7 +431,7 @@ class TidePlotManager:
             label_time = min_time + (max_time - min_time) * time_ratio
             time_label = label_time.strftime("%H:%M")
             
-            labels.append(f'<text x="{x}" y="{height - margin + 15}" text-anchor="middle" font-family="Arial" font-size="10" fill="black">{time_label}</text>')
+            labels.append(f'<text x="{x}" y="{height - margin + 15}" text-anchor="middle" font-family="Arial" font-size="10" fill="{text_color}">{time_label}</text>')
         
         # Y-axis (height) labels
         for i in range(5):
@@ -397,12 +440,12 @@ class TidePlotManager:
             label_height = min_height + (max_height - min_height) * height_ratio
             height_label = f"{label_height:.1f}m"
             
-            labels.append(f'<text x="{margin - 10}" y="{y + 3}" text-anchor="end" font-family="Arial" font-size="10" fill="black">{height_label}</text>')
+            labels.append(f'<text x="{margin - 10}" y="{y + 3}" text-anchor="end" font-family="Arial" font-size="10" fill="{text_color}">{height_label}</text>')
         
         # Axis labels
-        labels.append(f'<text x="{width/2}" y="{height - 10}" text-anchor="middle" font-family="Arial" font-size="12" fill="black">Tiempo</text>')
+        labels.append(f'<text x="{width/2}" y="{height - 10}" text-anchor="middle" font-family="Arial" font-size="12" fill="{text_color}">Time</text>')
         labels.append(f'''
-            <text x="15" y="{height/2}" text-anchor="middle" font-family="Arial" font-size="12" fill="black" 
+            <text x="15" y="{height/2}" text-anchor="middle" font-family="Arial" font-size="12" fill="{text_color}" 
                   transform="rotate(-90, 15, {height/2})">Tide Height (m)</text>
         ''')
         
@@ -410,11 +453,14 @@ class TidePlotManager:
 
     def _generate_error_svg(self) -> str:
         """Generate an error SVG when no data is available."""
+        bg_color = '#1e1e1e' if self._dark_mode and not self._transparent_background else ('none' if self._transparent_background else 'white')
+        text_color = '#FF5722' if self._dark_mode else 'red'  # Orange for dark mode, red for light
+        
         return f'''
         <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-            <rect width="800" height="400" fill="{"none" if self._transparent_background else "white"}"/>
-            <text x="400" y="200" text-anchor="middle" font-family="Arial" font-size="18" fill="red">
-                No se pudieron cargar los datos de marea
+            <rect width="800" height="400" fill="{bg_color}"/>
+            <text x="400" y="200" text-anchor="middle" font-family="Arial" font-size="18" fill="{text_color}">
+                Could not load tide data
             </text>
         </svg>
         '''

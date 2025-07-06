@@ -43,15 +43,25 @@ async def async_setup_entry(
         if station_id in coordinators:
             coordinator = coordinators[station_id]
             
-            # Create tide plot camera
-            camera = ModernTidesCamera(
+            # Create light mode tide plot camera
+            camera_light = ModernTidesCamera(
                 coordinator,
                 station_name,
-                entry.entry_id
+                entry.entry_id,
+                dark_mode=False
             )
-            entities.append(camera)
+            entities.append(camera_light)
             
-            _LOGGER.debug("Added camera for station: %s", station_name)
+            # Create dark mode tide plot camera
+            camera_dark = ModernTidesCamera(
+                coordinator,
+                station_name,
+                entry.entry_id,
+                dark_mode=True
+            )
+            entities.append(camera_dark)
+            
+            _LOGGER.debug("Added cameras (light and dark) for station: %s", station_name)
 
     if entities:
         async_add_entities(entities)
@@ -60,14 +70,19 @@ async def async_setup_entry(
 class ModernTidesCamera(Camera):
     """Modern Tides camera that displays tide plots."""
 
-    def __init__(self, coordinator, station_name: str, entry_id: str):
+    def __init__(self, coordinator, station_name: str, entry_id: str, dark_mode: bool = False):
         """Initialize the camera."""
         super().__init__()
         self.coordinator = coordinator
         self._station_name = station_name
         self._entry_id = entry_id
-        self._attr_name = f"{station_name} Tide Plot"
-        self._attr_unique_id = f"{DOMAIN}_{coordinator.station_id}_{entry_id}_camera"
+        self._dark_mode = dark_mode
+        
+        # Set name and unique_id based on mode
+        mode_suffix = " Dark" if dark_mode else ""
+        self._attr_name = f"{station_name} Tide Plot{mode_suffix}"
+        mode_id_suffix = "_dark" if dark_mode else ""
+        self._attr_unique_id = f"{DOMAIN}_{coordinator.station_id}_{entry_id}_camera{mode_id_suffix}"
         
         # Generate safe name for filename (will be used in async_added_to_hass)
         self._safe_name = station_name.lower().replace(" ", "_").replace("-", "_")
@@ -100,7 +115,8 @@ class ModernTidesCamera(Camera):
         await super().async_added_to_hass()
         
         # Generate image filename now that we have access to hass
-        self._image_filename = self.hass.config.path("www", f"{DOMAIN}_{self._safe_name}_plot.svg")
+        mode_suffix = "_dark" if self._dark_mode else ""
+        self._image_filename = self.hass.config.path("www", f"{DOMAIN}_{self._safe_name}_plot{mode_suffix}.svg")
         
         # Set content type for SVG images
         self.content_type = "image/svg+xml"
@@ -152,37 +168,24 @@ class ModernTidesCamera(Camera):
         """Update the camera image."""
         try:
             if self._image_filename is not None:
-                svg_filename = self._image_filename.replace('.png', '.svg')
-                
-                # First try to read SVG file if it exists
-                if os.path.exists(svg_filename):
+                # Read the SVG file directly (filename already includes the correct mode suffix)
+                if os.path.exists(self._image_filename):
                     # Check if SVG file has been updated
-                    file_mtime = os.path.getmtime(svg_filename)
+                    file_mtime = os.path.getmtime(self._image_filename)
                     
                     if self._last_updated is None or file_mtime > self._last_updated:
                         # Read SVG content and convert to bytes
-                        with open(svg_filename, "r", encoding='utf-8') as svg_file:
+                        with open(self._image_filename, "r", encoding='utf-8') as svg_file:
                             svg_content = svg_file.read()
                         
                         # For SVG content, we need to return it as bytes
                         # Home Assistant can handle SVG content type
                         self._last_image = svg_content.encode('utf-8')
                         self._last_updated = file_mtime
-                        _LOGGER.debug("Updated camera image (SVG) for %s", self._station_name)
-                        
-                elif os.path.exists(self._image_filename):
-                    # Fallback to PNG file
-                    file_mtime = os.path.getmtime(self._image_filename)
-                    
-                    if self._last_updated is None or file_mtime > self._last_updated:
-                        # Read the PNG image file
-                        with open(self._image_filename, "rb") as image_file:
-                            self._last_image = image_file.read()
-                        
-                        self._last_updated = file_mtime
-                        _LOGGER.debug("Updated camera image (PNG) for %s", self._station_name)
+                        mode_info = " (Dark Mode)" if self._dark_mode else " (Light Mode)"
+                        _LOGGER.debug("Updated camera image (SVG)%s for %s", mode_info, self._station_name)
                 else:
-                    _LOGGER.debug("Image file not found: %s or %s", self._image_filename, svg_filename)
+                    _LOGGER.debug("Image file not found: %s", self._image_filename)
                     self._last_image = None
             else:
                 _LOGGER.debug("Image filename not set yet")

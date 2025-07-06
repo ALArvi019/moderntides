@@ -79,13 +79,25 @@ class TideDataCoordinator(DataUpdateCoordinator):
         _LOGGER.debug("Creating coordinator for station %s (%s) with update interval %s",
                       self.station_name, self.station_id, update_interval)
 
-        # Initialize plot manager for tide charts
+        # Initialize plot managers for tide charts (light and dark mode)
         safe_name = self.station_name.lower().replace(" ", "_").replace("-", "_")
-        plot_filename = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot.svg")
+        
+        # Light mode plot manager
+        plot_filename_light = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot.svg")
         self.plot_manager = TidePlotManager(
             name=self.station_name,
-            filename=plot_filename,
-            transparent_background=False
+            filename=plot_filename_light,
+            transparent_background=False,
+            dark_mode=False
+        )
+        
+        # Dark mode plot manager
+        plot_filename_dark = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot_dark.svg")
+        self.plot_manager_dark = TidePlotManager(
+            name=self.station_name,
+            filename=plot_filename_dark,
+            transparent_background=False,
+            dark_mode=True
         )
 
         super().__init__(
@@ -132,15 +144,20 @@ class TideDataCoordinator(DataUpdateCoordinator):
                 else:
                     _LOGGER.error("No valid tide data found for station %s", self.station_id)
                 
-                # Generate tide plot
+                # Generate tide plots (both light and dark mode)
                 try:
                     if daily_data:
+                        # Generate light mode plot
                         await self.hass.async_add_executor_job(
                             self.plot_manager.generate_tide_plot, data
                         )
-                        _LOGGER.debug("Tide plot generated for station %s", self.station_id)
+                        # Generate dark mode plot
+                        await self.hass.async_add_executor_job(
+                            self.plot_manager_dark.generate_tide_plot, data
+                        )
+                        _LOGGER.debug("Tide plots (light and dark) generated for station %s", self.station_id)
                 except Exception as plot_err:
-                    _LOGGER.warning("Failed to generate tide plot for station %s: %s", 
+                    _LOGGER.warning("Failed to generate tide plots for station %s: %s", 
                                    self.station_id, plot_err)
                 
                 return data
