@@ -10,7 +10,5 @@
   "issue_tracker": "https://github.com/ALArvi019/moderntides/issues",
   "config_flow": true,
   "integration_type": "service",
-  "icon": "mdi:waves",
-  "homeassistant": "2023.9.0",
   "quality_scale": "silver"
 }

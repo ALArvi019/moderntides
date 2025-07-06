@@ -22,6 +22,7 @@ try:
         UpdateFailed,
     )
     from homeassistant.util import dt as dt_util
+    import homeassistant.helpers.config_validation as cv
 except ImportError:
     ConfigEntry = object
     HomeAssistant = object
@@ -29,6 +30,7 @@ except ImportError:
     DataUpdateCoordinator = object
     UpdateFailed = Exception
     dt_util = None
+    cv = None
 
 from .const import (
     DOMAIN,
@@ -43,6 +45,9 @@ from .tide_api import TideApiClient
 from .plot_manager import TidePlotManager
 
 _LOGGER = logging.getLogger(__name__)
+
+# Configuration schema - this integration only uses config entries
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 def _install_dependencies():
     try:
