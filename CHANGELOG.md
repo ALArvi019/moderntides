@@ -30,6 +30,9 @@
 
 ### Bug Fixes
 - **HASSFEST**: Removed invalid manifest fields (`homeassistant` and `icon`) to fix validation errors
+- **MANIFEST**: Fixed manifest.json key ordering for hassfest validation
+  - Reordered keys: domain, name, then alphabetical order
+  - Ensures compliance with Home Assistant manifest requirements
 - **CONFIG**: Added required `CONFIG_SCHEMA = cv.config_entry_only_config_schema` to `__init__.py`
 - **VALIDATION**: Fixed GitHub Actions hassfest validation issues that were preventing integration validation
 - **PLOT**: Fixed high and low tide extremes generation algorithm (#4)
