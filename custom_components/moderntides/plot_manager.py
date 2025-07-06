@@ -207,22 +207,31 @@ class TidePlotManager:
             return []
 
         extremes = []
-        
-        for i in range(1, len(predictions) - 1):
-            prev_height = predictions[i - 1]['height']
-            curr_height = predictions[i]['height']
-            next_height = predictions[i + 1]['height']
-            
+
+        for i in range(0, len(predictions)):
+            if i == 0:
+                prev_height = predictions[i]['height']
+                curr_height = predictions[i]['height']
+                next_height = predictions[i + 1]['height']
+            elif i == (len(predictions) - 1):
+                prev_height = predictions[i - 1]['height']
+                curr_height = predictions[i]['height']
+                next_height = predictions[i]['height']
+            else:
+                prev_height = predictions[i - 1]['height']
+                curr_height = predictions[i]['height']
+                next_height = predictions[i + 1]['height']
+
             # High tide: peak
-            if curr_height > prev_height and curr_height > next_height:
+            if curr_height >= prev_height and curr_height >= next_height:
                 extremes.append({
                     'time': predictions[i]['time'],
                     'height': curr_height,
                     'type': 'high'
                 })
-            
+
             # Low tide: trough
-            elif curr_height < prev_height and curr_height < next_height:
+            elif curr_height <= prev_height and curr_height <= next_height:
                 extremes.append({
                     'time': predictions[i]['time'],
                     'height': curr_height,
@@ -310,7 +319,7 @@ class TidePlotManager:
             # Add current time annotation
             curr_label = f'{current_height:.2f}m @ {current_time.strftime("%H:%M")}'
             svg_parts.append(f'''
-                <text x="{curr_x}" y="{curr_y - 15}" text-anchor="middle" font-family="Arial" font-size="10" fill="black">
+                <text x="{curr_x}" y="{curr_y - 15}" text-anchor="middle" font-family="Arial" font-size="12" fill="black">
                     {curr_label}
                 </text>
             ''')
@@ -328,7 +337,7 @@ class TidePlotManager:
             label_y = ext_y - 20 if extreme['type'] == 'high' else ext_y + 25
             ext_label = f"{extreme['height']:.2f}m @ {extreme['time'].strftime('%H:%M')}"
             svg_parts.append(f'''
-                <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="Arial" font-size="9" 
+                <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="Arial" font-size="12" 
                       fill="white" stroke="{color}" stroke-width="3" paint-order="stroke">
                     {ext_label}
                 </text>
