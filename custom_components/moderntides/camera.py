@@ -1,4 +1,6 @@
 """Camera platform for Modern Tides integration."""
+import aiofiles
+import aiofiles.os
 import logging
 import os
 import time
@@ -169,14 +171,14 @@ class ModernTidesCamera(Camera):
         try:
             if self._image_filename is not None:
                 # Read the SVG file directly (filename already includes the correct mode suffix)
-                if os.path.exists(self._image_filename):
+                if await aiofiles.os.path.exists(self._image_filename):
                     # Check if SVG file has been updated
-                    file_mtime = os.path.getmtime(self._image_filename)
+                    file_mtime = await aiofiles.os.path.getmtime(self._image_filename)
                     
                     if self._last_updated is None or file_mtime > self._last_updated:
-                        # Read SVG content and convert to bytes
-                        with open(self._image_filename, "r", encoding='utf-8') as svg_file:
-                            svg_content = svg_file.read()
+                        # Read SVG content and convert to bytes (non-blocking)
+                        async with aiofiles.open(self._image_filename, "r", encoding='utf-8') as svg_file:
+                            svg_content = await svg_file.read()
                         
                         # For SVG content, we need to return it as bytes
                         # Home Assistant can handle SVG content type
