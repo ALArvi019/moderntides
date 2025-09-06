@@ -31,37 +31,37 @@ cards:
         primary: Marea Actual
         secondary: "{{ states('sensor.STATION_NAME_current_tide_height') }} m"
         icon: >-
-              {% set high_tide = states('sensor.STATION_NAME_next_high_tide_time') |
-              as_timestamp(default=0) %} {% set low_tide =
-              states('sensor.STATION_NAME_next_low_tide_time') |
-              as_timestamp(default=0) %} {% set now = now().timestamp() %} {% set
-              diff_high = (high_tide - now) | abs %} {% set diff_low = (low_tide -
-              now) | abs %} {% if diff_high < diff_low %}
-                mdi:waves-arrow-right
-              {% else %}
-                mdi:waves-arrow-left
-              {% endif %}
+          {% set high_tide = states('sensor.STATION_NAME_next_high_tide_time') |
+          as_timestamp(default=0) %} {% set low_tide =
+          states('sensor.STATION_NAME_next_low_tide_time') | as_timestamp(default=0) %}
+          {% set now = now().timestamp() %} {% set diff_high = (high_tide - now)
+          | abs %} {% set diff_low = (low_tide - now) | abs %} {% if diff_high <
+          diff_low %}
+            mdi:waves-arrow-right
+          {% else %}
+            mdi:waves-arrow-left
+          {% endif %}
         icon_color: >-
-              {% set high_tide = states('sensor.STATION_NAME_next_high_tide_time') |
-              as_timestamp(default=0) %} {% set low_tide =
-              states('sensor.STATION_NAME_next_low_tide_time') |
-              as_timestamp(default=0) %} {% set now = now().timestamp() %} {% set
-              diff_high = (high_tide - now) | abs %} {% set diff_low = (low_tide -
-              now) | abs %} {% if diff_high < diff_low %}
-                blue
-              {% else %}
-                green
-              {% endif %}
+          {% set high_tide = states('sensor.STATION_NAME_next_high_tide_time') |
+          as_timestamp(default=0) %} {% set low_tide =
+          states('sensor.STATION_NAME_next_low_tide_time') | as_timestamp(default=0) %}
+          {% set now = now().timestamp() %} {% set diff_high = (high_tide - now)
+          | abs %} {% set diff_low = (low_tide - now) | abs %} {% if diff_high <
+          diff_low %}
+            blue
+          {% else %}
+            green
+          {% endif %}
         layout: vertical
         fill_container: true
         tap_action:
-           action: more-info
-           entity: sensor.STATION_NAME_current_tide_height
+          action: more-info
+          entity: sensor.STATION_NAME_current_tide_height
       - type: custom:mushroom-template-card
         primary: Próxima marea alta
         secondary: >-
-              {{ states('sensor.STATION_NAME_next_high_tide_time') | as_timestamp |
-              timestamp_custom('%H:%M') }}
+          {{ states('sensor.STATION_NAME_next_high_tide_time') | as_timestamp |
+          timestamp_custom('%H:%M') }}
         icon: mdi:arrow-up-bold
         icon_color: green
         layout: vertical
@@ -72,8 +72,8 @@ cards:
       - type: custom:mushroom-template-card
         primary: Próxima marea baja
         secondary: >-
-              {{ states('sensor.STATION_NAME_next_low_tide_time') | as_timestamp |
-              timestamp_custom('%H:%M') }}
+          {{ states('sensor.STATION_NAME_next_low_tide_time') | as_timestamp |
+          timestamp_custom('%H:%M') }}
         icon: mdi:arrow-down-bold
         icon_color: red
         layout: vertical
@@ -84,95 +84,96 @@ cards:
       - type: custom:mushroom-template-card
         primary: Viento
         secondary: >-
-              {{ state_attr('weather.forecast_STATION_NAME', 'wind_speed') }} {{
-              state_attr('weather.forecast_STATION_NAME', 'wind_speed_unit') }}
+          {{ state_attr('weather.forecast_STATION_NAME', 'wind_speed') }} {{
+          state_attr('weather.forecast_STATION_NAME', 'wind_speed_unit') }}
         icon: mdi:weather-windy
         icon_color: >-
-              {% set v = state_attr('weather.forecast_STATION_NAME', 'wind_speed') |
-              float(0) %} {% if v < 10 %}
-                green
-              {% elif v < 20 %}
-                yellow
-              {% else %}
-                red
-              {% endif %}
+          {% set v = state_attr('weather.forecast_STATION_NAME', 'wind_speed') |
+          float(0) %} {% if v < 10 %}
+            green
+          {% elif v < 20 %}
+            yellow
+          {% else %}
+            red
+          {% endif %}
         layout: vertical
         fill_container: true
         tap_action:
           action: more-info
-          entity: sensor.rota_wind
+          entity: sensor.STATION_NAME_wind
   - type: picture-elements
-    camera_image: camera.STATION_NAME_de_santa_maria_tide_plot_2d_dark
+    camera_image: camera.STATION_NAME_tide_plot_2d_dark
     style: |
-          ha-card {
-            border-radius: 16px;
-            overflow: hidden;
-            margin-top: 16px;
-          }
+      ha-card {
+        border-radius: 16px;
+        overflow: hidden;
+        margin-top: 16px;
+      }
     elements:
-          - entity: sensor.STATION_NAME_current_tide_height
-            style:
-              background-color: rgba(0, 100, 200, 0.8)
-              color: white
-              font-size: 13px
-              line-height: 0px
-              padding: 1px 5px
-              border-radius: 10px
-              pointer-events: none
-              font-weight: bold
-              right: "-70px"
-              top: 10px
-            prefix: "Actual: "
-            suffix: ""
-            type: state-label
-          - entity: sensor.STATION_NAME_next_high_tide_time
-            style:
-              background-color: rgba(0, 150, 0, 0.8)
-              color: white
-              font-size: 13px
-              line-height: 0px
-              padding: 1px 5px
-              border-radius: 10px
-              pointer-events: none
-              font-weight: bold
-              right: "-117px"
-              top: 30px
-            prefix: "↑ "
-            type: state-label
-          - entity: sensor.STATION_NAME_next_low_tide_time
-            style:
-              background-color: rgba(200, 0, 0, 0.8)
-              color: white
-              font-size: 13px
-              line-height: 0px
-              padding: 1px 5px
-              border-radius: 10px
-              pointer-events: none
-              font-weight: bold
-              right: "-117px"
-              top: 50px
-            prefix: "↓ "
-            type: state-label
+      - entity: sensor.STATION_NAME_current_tide_height
+        style:
+          background-color: rgba(0, 100, 200, 0.8)
+          color: white
+          font-size: 13px
+          line-height: 0px
+          padding: 1px 5px
+          border-radius: 10px
+          pointer-events: none
+          font-weight: bold
+          right: "-70px"
+          top: 10px
+        prefix: "Actual: "
+        suffix: ""
+        type: state-label
+      - entity: sensor.STATION_NAME_next_high_tide_time
+        style:
+          background-color: rgba(0, 150, 0, 0.8)
+          color: white
+          font-size: 13px
+          line-height: 0px
+          padding: 1px 5px
+          border-radius: 10px
+          pointer-events: none
+          font-weight: bold
+          right: "-117px"
+          top: 30px
+        prefix: "↑ "
+        type: state-label
+      - entity: sensor.STATION_NAME_next_low_tide_time
+        style:
+          background-color: rgba(200, 0, 0, 0.8)
+          color: white
+          font-size: 13px
+          line-height: 0px
+          padding: 1px 5px
+          border-radius: 10px
+          pointer-events: none
+          font-weight: bold
+          right: "-117px"
+          top: 50px
+        prefix: "↓ "
+        type: state-label
   - type: custom:mushroom-chips-card
     style: |
-          ha-card {
-            margin-top: 16px;
-          }
+      ha-card {
+        margin-top: 16px;
+      }
     chips:
-          - type: entity
-            entity: sensor.STATION_NAME_next_high_tide_time
-            icon: mdi:arrow-up-bold
-            icon_color: green
-            content_info: state
-            tap_action:
-              action: more-info
-          - type: entity
-            entity: sensor.STATION_NAME_next_low_tide_time
-            icon: mdi:arrow-down-bold
-            icon_color: red
-            content_info: state
-            tap_action:
-              action: more-info
+      - type: entity
+        entity: sensor.STATION_NAME_next_high_tide_time
+        icon: mdi:arrow-up-bold
+        icon_color: green
+        content_info: state
+        tap_action:
+          action: more-info
+      - type: entity
+        entity: sensor.STATION_NAME_next_low_tide_time
+        icon: mdi:arrow-down-bold
+        icon_color: red
+        content_info: state
+        tap_action:
+          action: more-info
+
 ```
 
 ## Usage Instructions
