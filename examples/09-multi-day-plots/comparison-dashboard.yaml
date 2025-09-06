@@ -1,0 +1,87 @@
+type: grid
+title: Tide Camera Comparison Dashboard
+columns: 2
+cards:
+  # Time Range Comparison
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 📅 Time Range Comparison
+        heading_style: title
+      - type: grid
+        columns: 2
+        cards:
+          - entity: camera.valencia_tide_plot
+            name: Today (1 Day)
+          - entity: camera.valencia_tide_plot_3d
+            name: Weekend (3 Days)
+          - entity: camera.valencia_tide_plot_5d
+            name: Work Week (5 Days)
+          - entity: camera.valencia_tide_plot_7d
+            name: Full Week (7 Days)
+
+  # Theme Comparison
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 🌓 Light vs Dark Themes
+        heading_style: title
+      - type: grid
+        columns: 2
+        cards:
+          - entity: camera.valencia_tide_plot_2d
+            name: Light Theme (2 Days)
+          - entity: camera.valencia_tide_plot_2d_dark
+            name: Dark Theme (2 Days)
+          - entity: camera.valencia_tide_plot_4d
+            name: Light Theme (4 Days)
+          - entity: camera.valencia_tide_plot_4d_dark
+            name: Dark Theme (4 Days)
+
+  # All Time Ranges Grid
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 📊 Complete Forecast Grid (Light Mode)
+        heading_style: title
+      - type: grid
+        columns: 3
+        cards:
+          - entity: camera.valencia_tide_plot
+            name: "1D"
+          - entity: camera.valencia_tide_plot_2d
+            name: "2D"
+          - entity: camera.valencia_tide_plot_3d
+            name: "3D"
+          - entity: camera.valencia_tide_plot_4d
+            name: "4D"
+          - entity: camera.valencia_tide_plot_5d
+            name: "5D"
+          - entity: camera.valencia_tide_plot_6d
+            name: "6D"
+          - entity: camera.valencia_tide_plot_7d
+            name: "7D"
+
+  # Dark Mode Grid
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 🌙 Dark Mode Collection
+        heading_style: title
+      - type: grid
+        columns: 3
+        cards:
+          - entity: camera.valencia_tide_plot_dark
+            name: "1D Dark"
+          - entity: camera.valencia_tide_plot_2d_dark
+            name: "2D Dark"
+          - entity: camera.valencia_tide_plot_3d_dark
+            name: "3D Dark"
+          - entity: camera.valencia_tide_plot_4d_dark
+            name: "4D Dark"
+          - entity: camera.valencia_tide_plot_5d_dark
+            name: "5D Dark"
+          - entity: camera.valencia_tide_plot_6d_dark
+            name: "6D Dark"
+          - entity: camera.valencia_tide_plot_7d_dark
+            name: "7D Dark"

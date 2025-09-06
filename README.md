@@ -16,12 +16,14 @@ A modern Home Assistant custom integration that provides real-time tide informat
 
 - **Real-time tide data** from official Spanish maritime institute
 - **Beautiful tide charts** as camera entities (SVG format)
+- **Multi-day tide plots**: Automatically generates plots for 1-7 days
 - **Dual visualization modes**: Light and dark theme support with automatic dual camera entities
 - **Multiple sensors** for current height and next tide times
 - **Easy configuration** through the UI
 - **Automatic updates** every 30 minutes
 - **Support for multiple stations** simultaneously
 - **Modern UI integration** with optimized color palettes for both light and dark interfaces
+- **Flexible plot selection**: Choose from 1-day to 7-day tide predictions in your dashboards
 
 ## Installation
 
@@ -71,7 +73,7 @@ For each configured tide station, the following entities will be created:
 - **Current height sensor**: Current tide height in meters
 - **Next high tide sensor**: Time and height of the next high tide
 - **Next low tide sensor**: Time and height of the next low tide
-- **Tide plot camera**: Beautiful graphical visualization of the day's tide curve
+- **Tide plot cameras**: 14 camera entities for different time ranges and themes
 
 ## Available Entities
 
@@ -86,10 +88,25 @@ After adding a station, you'll have access to these entities (replace `STATION_N
 
 ### Camera Entities
 
-Two camera entities are created for each station to provide flexible visualization options:
+The integration automatically creates **14 camera entities** for each station, giving you complete flexibility:
 
 - **Light Mode Camera** (`camera.STATION_NAME_tide_plot`): Traditional white background with blue tide curves, perfect for light-themed dashboards
+- `camera.STATION_NAME_tide_plot` - 1 day (default, backwards compatible)
+- `camera.STATION_NAME_tide_plot_2d` - 2 days
+- `camera.STATION_NAME_tide_plot_3d` - 3 days
+- `camera.STATION_NAME_tide_plot_4d` - 4 days
+- `camera.STATION_NAME_tide_plot_5d` - 5 days
+- `camera.STATION_NAME_tide_plot_6d` - 6 days
+- `camera.STATION_NAME_tide_plot_7d` - 7 days (1 week)
+
 - **Dark Mode Camera** (`camera.STATION_NAME_tide_plot_dark`): Dark background (#1e1e1e) with green tide curves and enhanced contrast, optimized for dark-themed interfaces
+- `camera.STATION_NAME_tide_plot_dark` - 1 day (default)
+- `camera.STATION_NAME_tide_plot_2d_dark` - 2 days
+- `camera.STATION_NAME_tide_plot_3d_dark` - 3 days
+- `camera.STATION_NAME_tide_plot_4d_dark` - 4 days
+- `camera.STATION_NAME_tide_plot_5d_dark` - 5 days
+- `camera.STATION_NAME_tide_plot_6d_dark` - 6 days
+- `camera.STATION_NAME_tide_plot_7d_dark` - 7 days (1 week)
 
 ### Visual Specifications
 

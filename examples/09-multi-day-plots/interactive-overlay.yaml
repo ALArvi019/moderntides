@@ -1,0 +1,115 @@
+type: picture-elements
+image: /local/moderntides_malaga_plot_7d.svg
+title: Interactive 7-Day Tide Forecast
+elements:
+  # Day selection buttons
+  - type: state-label
+    entity: sensor.malaga_current_tide_level
+    style:
+      top: 5%
+      left: 10%
+      color: white
+      background-color: rgba(0,0,0,0.7)
+      padding: 5px 10px
+      border-radius: 15px
+      font-size: 12px
+
+  - type: state-label
+    entity: sensor.malaga_tide_coefficient
+    style:
+      top: 5%
+      right: 10%
+      color: white
+      background-color: rgba(0,0,0,0.7)
+      padding: 5px 10px
+      border-radius: 15px
+      font-size: 12px
+
+  # Quick access overlay buttons
+  - type: service-button
+    title: Switch to Today
+    service: browser_mod.navigate
+    service_data:
+      path: /local/moderntides_malaga_plot.svg
+    style:
+      top: 85%
+      left: 15%
+      background-color: rgba(33, 150, 243, 0.8)
+      color: white
+      border-radius: 20px
+      padding: 8px 16px
+      font-size: 10px
+
+  - type: service-button
+    title: 3-Day View
+    service: browser_mod.navigate
+    service_data:
+      path: /local/moderntides_malaga_plot_3d.svg
+    style:
+      top: 85%
+      left: 50%
+      background-color: rgba(76, 175, 80, 0.8)
+      color: white
+      border-radius: 20px
+      padding: 8px 16px
+      font-size: 10px
+
+  - type: service-button
+    title: Dark Mode
+    service: browser_mod.navigate
+    service_data:
+      path: /local/moderntides_malaga_plot_7d_dark.svg
+    style:
+      top: 85%
+      right: 15%
+      background-color: rgba(158, 158, 158, 0.8)
+      color: white
+      border-radius: 20px
+      padding: 8px 16px
+      font-size: 10px
+
+  # Tide level indicators (approximate positions)
+  - type: icon
+    icon: mdi:arrow-up
+    style:
+      top: 30%
+      left: 20%
+      color: blue
+      --mdc-icon-size: 20px
+    title: High Tide Area
+
+  - type: icon
+    icon: mdi:arrow-down
+    style:
+      top: 70%
+      left: 20%
+      color: red
+      --mdc-icon-size: 20px
+    title: Low Tide Area
+
+  - type: icon
+    icon: mdi:arrow-up
+    style:
+      top: 25%
+      left: 50%
+      color: blue
+      --mdc-icon-size: 20px
+    title: High Tide Area
+
+  - type: icon
+    icon: mdi:arrow-down
+    style:
+      top: 75%
+      left: 50%
+      color: red
+      --mdc-icon-size: 20px
+    title: Low Tide Area
+
+  - type: icon
+    icon: mdi:arrow-up
+    style:
+      top: 20%
+      right: 20%
+      color: blue
+      --mdc-icon-size: 20px
+    title: High Tide Area

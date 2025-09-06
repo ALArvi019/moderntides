@@ -1,0 +1,98 @@
+type: grid
+title: Marine Activity Planning - Barcelona
+columns: 3
+cards:
+  # Sailing & Boating
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: ⛵ Sailing Forecast
+        heading_style: title
+      - type: markdown
+        content: |
+          **Best for:** Day sailing, marina departures
+          **Time Range:** Next 2 days
+      - entity: camera.barcelona_tide_plot_2d
+
+  # Fishing Planning
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 🎣 Fishing Windows
+        heading_style: title
+      - type: markdown
+        content: |
+          **Best for:** Shore & boat fishing
+          **Time Range:** Next 3 days
+      - entity: camera.barcelona_tide_plot_3d
+
+  # Beach Activities
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 🏖️ Beach Planning
+        heading_style: title
+      - type: markdown
+        content: |
+          **Best for:** Beach walks, tide pooling
+          **Time Range:** Today only
+      - entity: camera.barcelona_tide_plot
+
+  # Extended Trip Planning
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 🗓️ Week Trip Planning
+        heading_style: title
+      - type: markdown
+        content: |
+          **Best for:** Multi-day expeditions
+          **Time Range:** Full week outlook
+      - entity: camera.barcelona_tide_plot_7d_dark
+
+  # Harbor Operations
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: ⚓ Harbor Schedule
+        heading_style: title
+      - type: markdown
+        content: |
+          **Best for:** Docking, departures
+          **Time Range:** 4-day window
+      - entity: camera.barcelona_tide_plot_4d
+
+  # Research & Monitoring
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 📊 Tide Analysis
+        heading_style: title
+      - type: markdown
+        content: |
+          **Best for:** Pattern analysis
+          **Time Range:** 6-day trends
+      - entity: camera.barcelona_tide_plot_6d_dark
+
+  # Quick Reference Data
+  - type: vertical-stack
+    cards:
+      - type: heading
+        heading: 📈 Current Conditions
+        heading_style: subtitle
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.barcelona_current_tide_level
+            name: Level
+          - type: entity
+            entity: sensor.barcelona_tide_tendency
+            name: Trend
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.barcelona_tide_coefficient
+            name: Coefficient
+          - type: entity
+            entity: sensor.barcelona_next_extreme_time
+            name: Next Extreme

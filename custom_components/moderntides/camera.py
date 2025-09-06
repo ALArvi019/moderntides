@@ -37,7 +37,7 @@ async def async_setup_entry(
     
     _LOGGER.debug("Setting up cameras for %d stations", len(stations))
     
-    # Create camera entities for each station
+    # Create camera entities for each station and each day duration
     for station in stations:
         station_id = station[CONF_STATION_ID]
         station_name = station[CONF_STATION_NAME]
@@ -45,25 +45,29 @@ async def async_setup_entry(
         if station_id in coordinators:
             coordinator = coordinators[station_id]
             
-            # Create light mode tide plot camera
-            camera_light = ModernTidesCamera(
-                coordinator,
-                station_name,
-                entry.entry_id,
-                dark_mode=False
-            )
-            entities.append(camera_light)
+            # Create cameras for each day duration (1-7 days) in both light and dark modes
+            for days in range(1, 8):
+                # Light mode camera
+                camera_light = ModernTidesCamera(
+                    coordinator,
+                    station_name,
+                    entry.entry_id,
+                    plot_days=days,
+                    dark_mode=False
+                )
+                entities.append(camera_light)
+                
+                # Dark mode camera
+                camera_dark = ModernTidesCamera(
+                    coordinator,
+                    station_name,
+                    entry.entry_id,
+                    plot_days=days,
+                    dark_mode=True
+                )
+                entities.append(camera_dark)
             
-            # Create dark mode tide plot camera
-            camera_dark = ModernTidesCamera(
-                coordinator,
-                station_name,
-                entry.entry_id,
-                dark_mode=True
-            )
-            entities.append(camera_dark)
-            
-            _LOGGER.debug("Added cameras (light and dark) for station: %s", station_name)
+            _LOGGER.debug("Added %d cameras (light and dark, 1-7 days) for station: %s", 14, station_name)
 
     if entities:
         async_add_entities(entities)
@@ -72,19 +76,29 @@ async def async_setup_entry(
 class ModernTidesCamera(Camera):
     """Modern Tides camera that displays tide plots."""
 
-    def __init__(self, coordinator, station_name: str, entry_id: str, dark_mode: bool = False):
+    def __init__(self, coordinator, station_name: str, entry_id: str, plot_days: int = 1, dark_mode: bool = False):
         """Initialize the camera."""
         super().__init__()
         self.coordinator = coordinator
         self._station_name = station_name
         self._entry_id = entry_id
+        self._plot_days = plot_days
         self._dark_mode = dark_mode
         
-        # Set name and unique_id based on mode
+        # Set name and unique_id based on mode and days
         mode_suffix = " Dark" if dark_mode else ""
-        self._attr_name = f"{station_name} Tide Plot{mode_suffix}"
+        
+        # For 1 day, keep simple naming for backwards compatibility
+        if plot_days == 1:
+            day_suffix = ""
+            day_id_suffix = ""
+        else:
+            day_suffix = f" {plot_days}D"
+            day_id_suffix = f"_{plot_days}d"
+        
+        self._attr_name = f"{station_name} Tide Plot{day_suffix}{mode_suffix}"
         mode_id_suffix = "_dark" if dark_mode else ""
-        self._attr_unique_id = f"{DOMAIN}_{coordinator.station_id}_{entry_id}_camera{mode_id_suffix}"
+        self._attr_unique_id = f"{DOMAIN}_{coordinator.station_id}_{entry_id}_camera{day_id_suffix}{mode_id_suffix}"
         
         # Generate safe name for filename (will be used in async_added_to_hass)
         self._safe_name = station_name.lower().replace(" ", "_").replace("-", "_")
@@ -117,15 +131,14 @@ class ModernTidesCamera(Camera):
         await super().async_added_to_hass()
         
         # Generate image filename now that we have access to hass
-        # Get plot_days from coordinator to maintain naming consistency
-        plot_days = getattr(self.coordinator, 'plot_days', 1)
+        # Use the plot_days from this camera instance
         
         # Generate filename suffix based on plot days (maintain compatibility)
-        if plot_days == 1:
+        if self._plot_days == 1:
             # For 1 day, keep the original naming for backwards compatibility
             filename_suffix = ""
         else:
-            filename_suffix = f"_{plot_days}d"
+            filename_suffix = f"_{self._plot_days}d"
             
         mode_suffix = "_dark" if self._dark_mode else ""
         self._image_filename = self.hass.config.path("www", f"{DOMAIN}_{self._safe_name}_plot{filename_suffix}{mode_suffix}.svg")
