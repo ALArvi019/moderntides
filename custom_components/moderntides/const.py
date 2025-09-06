@@ -13,6 +13,9 @@ CONF_STATION_ID = "station_id"
 CONF_STATION_NAME = "station_name"
 CONF_UPDATE_INTERVAL = "update_interval"
 
+# Plot generation settings
+PLOT_DAYS_TO_GENERATE = [1, 2, 3, 4, 5, 6, 7]  # Generate plots for these day ranges
+
 # Update intervals in minutes
 DEFAULT_UPDATE_INTERVAL = 360
 INTERVALS = {

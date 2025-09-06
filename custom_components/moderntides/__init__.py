@@ -33,13 +33,14 @@ except ImportError:
     cv = None
 
 from .const import (
-    DOMAIN,
-    PLATFORMS,
     CONF_STATION_ID,
     CONF_STATION_NAME,
     CONF_STATIONS,
     CONF_UPDATE_INTERVAL,
-    INTERVALS
+    DOMAIN,
+    INTERVALS,
+    PLATFORMS,
+    PLOT_DAYS_TO_GENERATE
 )
 from .tide_api import TideApiClient
 from .plot_manager import TidePlotManager
@@ -79,26 +80,44 @@ class TideDataCoordinator(DataUpdateCoordinator):
         _LOGGER.debug("Creating coordinator for station %s (%s) with update interval %s",
                       self.station_name, self.station_id, update_interval)
 
-        # Initialize plot managers for tide charts (light and dark mode)
+        # Initialize plot managers for tide charts (light and dark mode) for multiple days
         safe_name = self.station_name.lower().replace(" ", "_").replace("-", "_")
         
-        # Light mode plot manager
-        plot_filename_light = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot.svg")
-        self.plot_manager = TidePlotManager(
-            name=self.station_name,
-            filename=plot_filename_light,
-            transparent_background=False,
-            dark_mode=False
-        )
+        # Create plot managers for each day configuration
+        self.plot_managers = {}
         
-        # Dark mode plot manager
-        plot_filename_dark = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot_dark.svg")
-        self.plot_manager_dark = TidePlotManager(
-            name=self.station_name,
-            filename=plot_filename_dark,
-            transparent_background=False,
-            dark_mode=True
-        )
+        for days in PLOT_DAYS_TO_GENERATE:
+            # Generate filename suffix based on plot days (maintain compatibility)
+            if days == 1:
+                # For 1 day, keep the original naming for backwards compatibility
+                filename_suffix = ""
+            else:
+                filename_suffix = f"_{days}d"
+            
+            # Light mode plot manager
+            plot_filename_light = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot{filename_suffix}.svg")
+            light_manager = TidePlotManager(
+                name=self.station_name,
+                filename=plot_filename_light,
+                transparent_background=False,
+                dark_mode=False,
+                plot_days=days
+            )
+            
+            # Dark mode plot manager
+            plot_filename_dark = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot{filename_suffix}_dark.svg")
+            dark_manager = TidePlotManager(
+                name=self.station_name,
+                filename=plot_filename_dark,
+                transparent_background=False,
+                dark_mode=True,
+                plot_days=days
+            )
+            
+            self.plot_managers[days] = {
+                'light': light_manager,
+                'dark': dark_manager
+            }
 
         super().__init__(
             hass,
@@ -111,11 +130,29 @@ class TideDataCoordinator(DataUpdateCoordinator):
         """Fetch data from API endpoint."""
         try:
             async with async_timeout.timeout(10):
-                # Get current day data
-                today = datetime.datetime.now().strftime("%Y%m%d")
-                daily_data = await self.hass.async_add_executor_job(
-                    self.api_client.get_daily_tides, self.station_id, today
-                )
+                # Get data for the maximum number of days (7 days)
+                max_days = max(PLOT_DAYS_TO_GENERATE)
+                all_daily_data = []
+                base_date = datetime.datetime.now()
+                
+                # Get data for each day
+                for day_offset in range(max_days):
+                    current_date = base_date + datetime.timedelta(days=day_offset)
+                    date_str = current_date.strftime("%Y%m%d")
+                    
+                    daily_data = await self.hass.async_add_executor_job(
+                        self.api_client.get_daily_tides, self.station_id, date_str
+                    )
+                    
+                    if daily_data:
+                        all_daily_data.append({
+                            'date': date_str,
+                            'data': daily_data
+                        })
+                        _LOGGER.debug("Got data for station %s, date %s", self.station_id, date_str)
+                
+                # For backwards compatibility, use the first day as "daily_data"
+                daily_data = all_daily_data[0]['data'] if all_daily_data else {}
                 
                 # Log the data structure for debugging
                 _LOGGER.debug("Daily data for station %s: %s", self.station_id, daily_data)
@@ -130,6 +167,7 @@ class TideDataCoordinator(DataUpdateCoordinator):
                 data = {
                     "daily": daily_data,
                     "monthly": monthly_data,
+                    "all_daily_data": all_daily_data,  # Include all days for multi-day plots
                     "station_id": self.station_id,
                     "station_name": self.station_name
                 }
@@ -144,18 +182,27 @@ class TideDataCoordinator(DataUpdateCoordinator):
                 else:
                     _LOGGER.error("No valid tide data found for station %s", self.station_id)
                 
-                # Generate tide plots (both light and dark mode)
+                # Generate tide plots for all day configurations
                 try:
                     if daily_data:
-                        # Generate light mode plot
-                        await self.hass.async_add_executor_job(
-                            self.plot_manager.generate_tide_plot, data
-                        )
-                        # Generate dark mode plot
-                        await self.hass.async_add_executor_job(
-                            self.plot_manager_dark.generate_tide_plot, data
-                        )
-                        _LOGGER.debug("Tide plots (light and dark) generated for station %s", self.station_id)
+                        for days in PLOT_DAYS_TO_GENERATE:
+                            # Create data subset for this day range
+                            days_data = {
+                                **data,
+                                "plot_days": days,
+                                "all_daily_data": all_daily_data[:days]  # Only include days up to this range
+                            }
+                            
+                            # Generate light mode plot
+                            await self.hass.async_add_executor_job(
+                                self.plot_managers[days]['light'].generate_tide_plot, days_data
+                            )
+                            # Generate dark mode plot
+                            await self.hass.async_add_executor_job(
+                                self.plot_managers[days]['dark'].generate_tide_plot, days_data
+                            )
+                            
+                        _LOGGER.debug("Tide plots (light and dark) generated for all day ranges for station %s", self.station_id)
                 except Exception as plot_err:
                     _LOGGER.warning("Failed to generate tide plots for station %s: %s", 
                                    self.station_id, plot_err)

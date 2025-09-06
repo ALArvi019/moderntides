@@ -20,12 +20,14 @@ class TidePlotManager:
         filename: str,
         transparent_background: bool = False,
         dark_mode: bool = False,
+        plot_days: int = 1,
     ):
         """Initialize the plot manager."""
         self._name = name
         self._filename = filename
         self._transparent_background = transparent_background
         self._dark_mode = dark_mode
+        self._plot_days = plot_days
 
     def generate_tide_plot(
         self, 
@@ -76,8 +78,51 @@ class TidePlotManager:
         """Extract prediction data from the processed tide data."""
         predictions = []
         
-        # Check if we have processed tide_points in the data
-        if "tide_points" in tide_data and tide_data["tide_points"]:
+        # Check if we have multi-day data
+        if "all_daily_data" in tide_data and tide_data["all_daily_data"] and self._plot_days > 1:
+            _LOGGER.debug("Processing multi-day data for %d days", self._plot_days)
+            
+            # Process each day's data
+            for day_data_info in tide_data["all_daily_data"]:
+                day_data = day_data_info["data"]
+                date_str = day_data_info["date"]
+                
+                # Parse date to get the day offset
+                day_date = datetime.datetime.strptime(date_str, "%Y%m%d")
+                
+                # Extract predictions from this day
+                if day_data and "mareas" in day_data and "datos" in day_data["mareas"]:
+                    if "marea" in day_data["mareas"]["datos"]:
+                        marea_data = day_data["mareas"]["datos"]["marea"]
+                        
+                        for point in marea_data:
+                            if "hora" in point and "altura" in point:
+                                try:
+                                    time_str = point["hora"]  # Format is "HH:MM"
+                                    height = float(point["altura"])
+                                    
+                                    # Parse time and combine with the correct date
+                                    time_parts = time_str.split(":")
+                                    hours = int(time_parts[0])
+                                    minutes = int(time_parts[1])
+                                    
+                                    # Create datetime for this specific day
+                                    dt = day_date.replace(hour=hours, minute=minutes)
+                                    
+                                    predictions.append({
+                                        'time': dt,
+                                        'height': height
+                                    })
+                                except (ValueError, TypeError) as e:
+                                    _LOGGER.debug(f"Skipping invalid prediction entry: {e}")
+                                    continue
+            
+            # Sort by time to ensure chronological order
+            predictions.sort(key=lambda x: x['time'])
+            _LOGGER.debug("Extracted %d multi-day predictions", len(predictions))
+            
+        # Check if we have processed tide_points in the data (single day or fallback)
+        elif "tide_points" in tide_data and tide_data["tide_points"]:
             predictions = tide_data["tide_points"]
             _LOGGER.debug("Using %d processed tide points", len(predictions))
         else:
@@ -392,10 +437,15 @@ class TidePlotManager:
             min_time, max_time, min_height, max_height, colors['axis_text']
         ))
         
-        # Add title
+        # Add title with dynamic text based on plot days
+        if self._plot_days == 1:
+            title_text = f"Tide Prediction - {self._name}"
+        else:
+            title_text = f"Tide Prediction ({self._plot_days} days) - {self._name}"
+            
         svg_parts.append(f'''
             <text x="{width/2}" y="25" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="{colors["title"]}">
-                Tide Prediction - {self._name}
+                {title_text}
             </text>
         ''')
         

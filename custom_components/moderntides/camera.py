@@ -117,8 +117,18 @@ class ModernTidesCamera(Camera):
         await super().async_added_to_hass()
         
         # Generate image filename now that we have access to hass
+        # Get plot_days from coordinator to maintain naming consistency
+        plot_days = getattr(self.coordinator, 'plot_days', 1)
+        
+        # Generate filename suffix based on plot days (maintain compatibility)
+        if plot_days == 1:
+            # For 1 day, keep the original naming for backwards compatibility
+            filename_suffix = ""
+        else:
+            filename_suffix = f"_{plot_days}d"
+            
         mode_suffix = "_dark" if self._dark_mode else ""
-        self._image_filename = self.hass.config.path("www", f"{DOMAIN}_{self._safe_name}_plot{mode_suffix}.svg")
+        self._image_filename = self.hass.config.path("www", f"{DOMAIN}_{self._safe_name}_plot{filename_suffix}{mode_suffix}.svg")
         
         # Set content type for SVG images
         self.content_type = "image/svg+xml"
