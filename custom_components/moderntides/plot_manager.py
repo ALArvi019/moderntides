@@ -89,6 +89,9 @@ class TidePlotManager:
                 
                 # Parse date to get the day offset
                 day_date = datetime.datetime.strptime(date_str, "%Y%m%d")
+                # Convert to timezone-aware UTC first, then to local
+                day_date = dt_util.utc_from_timestamp(day_date.timestamp())
+                day_date = dt_util.as_local(day_date)
                 
                 # Extract predictions from this day
                 if day_data and "mareas" in day_data and "datos" in day_data["mareas"]:
@@ -108,6 +111,10 @@ class TidePlotManager:
                                     
                                     # Create datetime for this specific day
                                     dt = day_date.replace(hour=hours, minute=minutes)
+                                    # API returns UTC times, convert to timezone-aware UTC first
+                                    dt = dt_util.utc_from_timestamp(dt.timestamp())
+                                    # Then convert to Home Assistant's local timezone
+                                    dt = dt_util.as_local(dt)
                                     
                                     predictions.append({
                                         'time': dt,
@@ -151,6 +158,10 @@ class TidePlotManager:
                                 # Combine date and time
                                 datetime_str = f"{fecha_str} {hora_str}"
                                 dt = datetime.datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S")
+                                # API returns UTC times, convert to timezone-aware UTC first
+                                dt = dt_util.utc_from_timestamp(dt.timestamp())
+                                # Then convert to Home Assistant's local timezone
+                                dt = dt_util.as_local(dt)
                                 
                                 # Get height
                                 height = float(entry.get("altura", 0))
