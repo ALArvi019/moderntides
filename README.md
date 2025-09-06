@@ -144,6 +144,7 @@ Explore our collection of dashboard examples to get the most out of your Modern 
 | [![Dark Mode](examples/06-dark-mode-visualization/preview.png)](examples/06-dark-mode-visualization/) | **[Dark Mode Visualization](examples/06-dark-mode-visualization/)** | Automatic theme switching and dual cameras |
 | [![Comprehensive Weather](examples/07-comprehensive-weather-tides/preview.png)](examples/07-comprehensive-weather-tides/) | **[Comprehensive Weather & Tides](examples/07-comprehensive-weather-tides/)** | Complete weather and tide monitoring dashboard |
 | [![Multiple Stations](examples/08-multiple-stations/preview.png)](examples/08-multiple-stations/) | **[Multiple Stations](examples/08-multiple-stations/)** | Side-by-side comparison dashboard |
+| [![Multi-Day Plots](examples/09-multi-day-plots/preview.png)](examples/09-multi-day-plots/) | **[Multi-Day Plots](examples/09-multi-day-plots/)** | 1-7 day forecasts with automatic generation |
 
 ### Quick Start
 
