@@ -17,157 +17,133 @@ A comprehensive guide to using the automatic multi-day camera entities for tide 
 ## Available Camera Entities
 
 ### Light Mode Cameras
-- `camera.STATION_NAME_tide_plot` - 1 day (default)
-- `camera.STATION_NAME_tide_plot_2d` - 2 days
-- `camera.STATION_NAME_tide_plot_3d` - 3 days
-- `camera.STATION_NAME_tide_plot_4d` - 4 days
-- `camera.STATION_NAME_tide_plot_5d` - 5 days
-- `camera.STATION_NAME_tide_plot_6d` - 6 days
-- `camera.STATION_NAME_tide_plot_7d` - 7 days
+- `camera.moderntides_STATION_ID_camera` - 1 day (default)
+- `camera.moderntides_STATION_ID_camera_2d` - 2 days
+- `camera.moderntides_STATION_ID_camera_3d` - 3 days
+- `camera.moderntides_STATION_ID_camera_4d` - 4 days
+- `camera.moderntides_STATION_ID_camera_5d` - 5 days
+- `camera.moderntides_STATION_ID_camera_6d` - 6 days
+- `camera.moderntides_STATION_ID_camera_7d` - 7 days
 
 ### Dark Mode Cameras
-- `camera.STATION_NAME_tide_plot_dark` - 1 day
-- `camera.STATION_NAME_tide_plot_2d_dark` - 2 days
-- `camera.STATION_NAME_tide_plot_3d_dark` - 3 days
-- `camera.STATION_NAME_tide_plot_4d_dark` - 4 days
-- `camera.STATION_NAME_tide_plot_5d_dark` - 5 days
-- `camera.STATION_NAME_tide_plot_6d_dark` - 6 days
-- `camera.STATION_NAME_tide_plot_7d_dark` - 7 days
+- `camera.moderntides_STATION_ID_camera_dark` - 1 day
+- `camera.moderntides_STATION_ID_camera_2d_dark` - 2 days
+- `camera.moderntides_STATION_ID_camera_3d_dark` - 3 days
+- `camera.moderntides_STATION_ID_camera_4d_dark` - 4 days
+- `camera.moderntides_STATION_ID_camera_5d_dark` - 5 days
+- `camera.moderntides_STATION_ID_camera_6d_dark` - 6 days
+- `camera.moderntides_STATION_ID_camera_7d_dark` - 7 days
 
 ## Basic Dashboard Example
 
 ```yaml
 type: grid
-title: Multi-Day Tide Forecasts - STATION_NAME
+title: Tide Camera Comparison Dashboard
 columns: 2
 cards:
-  # Single Day vs Week Comparison
+  # Time Range Comparison
   - type: vertical-stack
     cards:
       - type: heading
-        heading: Daily Forecast
+        heading: 📅 Time Range Comparison
         heading_style: title
-      - entity: camera.STATION_NAME_tide_plot
-        
+      - type: grid
+        columns: 2
+        cards:
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot
+            name: Today (1 Day)
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_3d
+            name: Weekend (3 Days)
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_5d
+            name: Work Week (5 Days)
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_7d
+            name: Full Week (7 Days)
+
+  # Theme Comparison
   - type: vertical-stack
     cards:
       - type: heading
-        heading: Weekly Forecast
+        heading: 🌓 Light vs Dark Themes
         heading_style: title
-      - entity: camera.STATION_NAME_tide_plot_7d
+      - type: grid
+        columns: 2
+        cards:
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_2d
+            name: Light Theme (2 Days)
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_2d_dark
+            name: Dark Theme (2 Days)
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_4d
+            name: Light Theme (4 Days)
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_4d_dark
+            name: Dark Theme (4 Days)
 
-  # 2-Day and 3-Day Views
+  # All Time Ranges Grid
   - type: vertical-stack
     cards:
       - type: heading
-        heading: 2-Day Forecast
-        heading_style: subtitle
-      - entity: camera.STATION_NAME_tide_plot_2d
-        
+        heading: 📊 Complete Forecast Grid (Light Mode)
+        heading_style: title
+      - type: grid
+        columns: 3
+        cards:
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot
+            name: "1D"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_2d
+            name: "2D"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_3d
+            name: "3D"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_4d
+            name: "4D"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_5d
+            name: "5D"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_6d
+            name: "6D"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_7d
+            name: "7D"
+
+  # Dark Mode Grid
   - type: vertical-stack
     cards:
       - type: heading
-        heading: 3-Day Forecast
-        heading_style: subtitle
-      - entity: camera.STATION_NAME_tide_plot_3d
+        heading: 🌙 Dark Mode Collection
+        heading_style: title
+      - type: grid
+        columns: 3
+        cards:
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_dark
+            name: "1D Dark"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_2d_dark
+            name: "2D Dark"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_3d_dark
+            name: "3D Dark"
+          - type: picture-entity
+            entity: camera.STATION_NAME_tide_plot_4d_dark
+            name: "4D Dark"
+          - entity: camera.STATION_NAME_tide_plot_5d_dark
+            name: "5D Dark"
+          - entity: camera.STATION_NAME_tide_plot_6d_dark
+            name: "6D Dark"
+          - entity: camera.STATION_NAME_tide_plot_7d_dark
+            name: "7D Dark"
 
-  # 4-Day and 5-Day Views
-  - type: vertical-stack
-    cards:
-      - type: heading
-        heading: 4-Day Forecast
-        heading_style: subtitle
-      - entity: camera.STATION_NAME_tide_plot_4d
-        
-  - type: vertical-stack
-    cards:
-      - type: heading
-        heading: 5-Day Forecast
-        heading_style: subtitle
-      - entity: camera.STATION_NAME_tide_plot_5d
-
-  # Dark Mode Examples
-  - type: vertical-stack
-    cards:
-      - type: heading
-        heading: 6-Day Forecast (Dark)
-        heading_style: subtitle
-      - entity: camera.STATION_NAME_tide_plot_6d_dark
-        
-  - type: vertical-stack
-    cards:
-      - type: heading
-        heading: Current vs Weekly (Dark)
-        heading_style: subtitle
-      - entity: camera.STATION_NAME_tide_plot_dark
-      - entity: camera.STATION_NAME_tide_plot_7d_dark
-```
-
-## Usage Instructions
-
-1. **Configure a tide station** in the Modern Tides integration
-2. Replace `STATION_NAME` with your actual station name (e.g., `cadiz`, `barcelona`)
-3. Copy the YAML code above
-4. Add it to your Home Assistant dashboard
-5. All 14 camera entities are automatically created - just choose which ones to use
-
-## Camera Entity Examples
-
-### Single Camera Focus
-```yaml
-# Focus on just one time range
-- entity: camera.STATION_NAME_tide_plot_3d
-  name: 3-Day Tide Forecast
-```
-
-### Picture Elements Integration
-```yaml
-# Use in picture elements for overlays
-type: picture-elements
-camera_image: camera.STATION_NAME_tide_plot_7d
-elements:
-  - type: state-label
-    entity: sensor.STATION_NAME_current_tide_height
-    style:
-      top: 10%
-      left: 10%
-```
-
-### Entities Card Integration
-```yaml
-# Mix with sensor data
-type: entities
-entities:
-  - sensor.STATION_NAME_current_tide_height
-  - sensor.STATION_NAME_next_high_tide_time
-  - camera.STATION_NAME_tide_plot_3d
-```
-
-### Grid Layout Customization
-```yaml
-# Change columns for horizontal layout
-columns: 4  # Shows 4 cameras per row
-```
-
-### Dark Theme Integration
-```yaml
-# Perfect for dark-themed dashboards
-- entity: camera.STATION_NAME_tide_plot_7d_dark
-  name: Weekly Forecast (Dark)
-```
-
-### Custom Headings
-```yaml
-# Customize section titles
-- type: heading
-  heading: "Weekend Tides"
-  heading_style: title
-```
-
-### Dark Theme Integration
-```yaml
-# Perfect for dark-themed dashboards
-image: /local/moderntides_STATION_NAME_plot_7d_dark.svg
 ```
 
 ## Perfect Use Cases
