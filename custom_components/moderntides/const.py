@@ -36,7 +36,7 @@ API_MONTH_TIDES = f"{API_BASE_URL}?request=gettide&format=json&id={{station_id}}
 # Default color schemes for tide plots
 # Light mode colors - using high contrast black text for better readability
 DEFAULT_COLORS_LIGHT = {
-    'background': 'white',
+    'background': '#FFFFFF',  # White
     'grid': '#D3D3D3',
     'tide_line': '#6495ED',  # Cornflower blue
     'tide_fill': '#ADD8E6',  # Light blue
@@ -48,6 +48,7 @@ DEFAULT_COLORS_LIGHT = {
     'text': '#000000',  # Black text
     'title': '#000000',  # Black title
     'axis_text': '#000000',  # Black axis text
+    'error_text': '#CC0000',  # Error message text color
 }
 
 # Dark mode colors - optimized for dark interfaces
@@ -64,6 +65,7 @@ DEFAULT_COLORS_DARK = {
     'text': '#FFFFFF',  # White text
     'title': '#FFFFFF',  # White title
     'axis_text': '#CCCCCC',  # Light gray axis text
+    'error_text': '#FF5722',  # Error message text color (orange)
 }
 
 # Default font settings

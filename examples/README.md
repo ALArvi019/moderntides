@@ -141,6 +141,6 @@ entities:
 |---------|-------------------|----------|
 | 01-08 | v1.0+ | Basic functionality |
 | 09 | v1.1.4+ | Multi-day plots |
-| 10 | v1.2.0+ | Custom colors and fonts |
+| 10 | v1.1.6+ | Custom colors and fonts |
 
 All examples are backwards compatible and regularly updated.

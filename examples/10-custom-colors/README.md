@@ -184,7 +184,7 @@ elements:
 
 ## Requirements
 
-- Modern Tides integration v1.2.0+ (with color customization support)
+- Modern Tides integration (with color customization support - version 1.1.6+)
 - At least one tide station configured
 
 ## Difficulty Level

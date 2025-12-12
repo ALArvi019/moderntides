@@ -519,8 +519,9 @@ class TidePlotManager:
         """Generate an error SVG when no data is available."""
         # Use stored colors with fallback to defaults from constants
         default_bg = DEFAULT_COLORS_DARK['background'] if self._dark_mode else DEFAULT_COLORS_LIGHT['background']
+        default_error = DEFAULT_COLORS_DARK['error_text'] if self._dark_mode else DEFAULT_COLORS_LIGHT['error_text']
         bg_color = self._colors.get('background', default_bg)
-        text_color = '#FF5722' if self._dark_mode else 'red'  # Orange for dark mode, red for light
+        text_color = self._colors.get('error_text', default_error)
         
         return f'''
         <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
