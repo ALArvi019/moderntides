@@ -8,6 +8,15 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from homeassistant.util import dt as dt_util
 
+from .const import (
+    DEFAULT_COLORS_LIGHT,
+    DEFAULT_COLORS_DARK,
+    DEFAULT_FONT_FAMILY,
+    DEFAULT_FONT_SIZE_TITLE,
+    DEFAULT_FONT_SIZE_LABELS,
+    DEFAULT_FONT_SIZE_AXIS,
+)
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -21,6 +30,11 @@ class TidePlotManager:
         transparent_background: bool = False,
         dark_mode: bool = False,
         plot_days: int = 1,
+        custom_colors: Optional[Dict[str, str]] = None,
+        font_family: Optional[str] = None,
+        font_size_title: Optional[int] = None,
+        font_size_labels: Optional[int] = None,
+        font_size_axis: Optional[int] = None,
     ):
         """Initialize the plot manager."""
         self._name = name
@@ -28,6 +42,24 @@ class TidePlotManager:
         self._transparent_background = transparent_background
         self._dark_mode = dark_mode
         self._plot_days = plot_days
+        
+        # Set colors: use custom colors if provided, otherwise use defaults
+        default_colors = DEFAULT_COLORS_DARK if dark_mode else DEFAULT_COLORS_LIGHT
+        if custom_colors:
+            # Merge custom colors with defaults (custom colors override defaults)
+            self._colors = {**default_colors, **custom_colors}
+        else:
+            self._colors = default_colors.copy()
+        
+        # Handle transparent background
+        if transparent_background:
+            self._colors['background'] = 'none'
+        
+        # Set font settings
+        self._font_family = font_family or DEFAULT_FONT_FAMILY
+        self._font_size_title = font_size_title or DEFAULT_FONT_SIZE_TITLE
+        self._font_size_labels = font_size_labels or DEFAULT_FONT_SIZE_LABELS
+        self._font_size_axis = font_size_axis or DEFAULT_FONT_SIZE_AXIS
 
     def generate_tide_plot(
         self, 
@@ -329,37 +361,8 @@ class TidePlotManager:
         min_height -= height_range * 0.1
         max_height += height_range * 0.1
         
-        # Define color scheme based on mode
-        if self._dark_mode:
-            colors = {
-                'background': '#1e1e1e' if not self._transparent_background else 'none',
-                'grid': '#404040',
-                'tide_line': '#4CAF50',  # Green for dark mode
-                'tide_fill': '#4CAF50',  # Green fill with opacity
-                'tide_fill_opacity': '0.2',
-                'current_marker': '#FFF',  # White marker
-                'current_text': '#FFF',   # White text
-                'high_tide': '#FF5722',   # Orange for high tide
-                'low_tide': '#2196F3',    # Blue for low tide
-                'text': '#FFF',           # White text
-                'title': '#FFF',          # White title
-                'axis_text': '#CCC',      # Light gray for axis text
-            }
-        else:
-            colors = {
-                'background': 'white' if not self._transparent_background else 'none',
-                'grid': 'lightgray',
-                'tide_line': 'cornflowerblue',
-                'tide_fill': 'lightblue',
-                'tide_fill_opacity': '0.3',
-                'current_marker': 'black',
-                'current_text': 'black',
-                'high_tide': 'red',
-                'low_tide': 'blue',
-                'text': 'black',
-                'title': 'black',
-                'axis_text': 'black',
-            }
+        # Use stored colors (already configured in __init__ with defaults/custom)
+        colors = self._colors
         
         # Helper functions for coordinate conversion
         def time_to_x(time_val):
@@ -409,7 +412,7 @@ class TidePlotManager:
             # Add current time annotation
             curr_label = f'{current_height:.2f}m @ {current_time.strftime("%H:%M")}'
             svg_parts.append(f'''
-                <text x="{curr_x}" y="{curr_y - 15}" text-anchor="middle" font-family="Arial" font-size="12" fill="{colors["current_text"]}">
+                <text x="{curr_x}" y="{curr_y - 15}" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_labels}" fill="{colors["current_text"]}">
                     {curr_label}
                 </text>
             ''')
@@ -429,14 +432,14 @@ class TidePlotManager:
             # Different text styling for dark vs light mode
             if self._dark_mode:
                 svg_parts.append(f'''
-                    <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="Arial" font-size="12" 
+                    <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_labels}" 
                           fill="{colors["text"]}" stroke="{color}" stroke-width="1" paint-order="stroke">
                         {ext_label}
                     </text>
                 ''')
             else:
                 svg_parts.append(f'''
-                    <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="Arial" font-size="12" 
+                    <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_labels}" 
                           fill="white" stroke="{color}" stroke-width="3" paint-order="stroke">
                         {ext_label}
                     </text>
@@ -455,7 +458,7 @@ class TidePlotManager:
             title_text = f"Tide Prediction ({self._plot_days} days) - {self._name}"
             
         svg_parts.append(f'''
-            <text x="{width/2}" y="25" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="{colors["title"]}">
+            <text x="{width/2}" y="25" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_title}" font-weight="bold" fill="{colors["title"]}">
                 {title_text}
             </text>
         ''')
@@ -492,7 +495,7 @@ class TidePlotManager:
             label_time = min_time + (max_time - min_time) * time_ratio
             time_label = label_time.strftime("%H:%M")
             
-            labels.append(f'<text x="{x}" y="{height - margin + 15}" text-anchor="middle" font-family="Arial" font-size="10" fill="{text_color}">{time_label}</text>')
+            labels.append(f'<text x="{x}" y="{height - margin + 15}" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_axis}" fill="{text_color}">{time_label}</text>')
         
         # Y-axis (height) labels
         for i in range(5):
@@ -501,12 +504,12 @@ class TidePlotManager:
             label_height = min_height + (max_height - min_height) * height_ratio
             height_label = f"{label_height:.1f}m"
             
-            labels.append(f'<text x="{margin - 10}" y="{y + 3}" text-anchor="end" font-family="Arial" font-size="10" fill="{text_color}">{height_label}</text>')
+            labels.append(f'<text x="{margin - 10}" y="{y + 3}" text-anchor="end" font-family="{self._font_family}" font-size="{self._font_size_axis}" fill="{text_color}">{height_label}</text>')
         
         # Axis labels
-        labels.append(f'<text x="{width/2}" y="{height - 10}" text-anchor="middle" font-family="Arial" font-size="12" fill="{text_color}">Time</text>')
+        labels.append(f'<text x="{width/2}" y="{height - 10}" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_labels}" fill="{text_color}">Time</text>')
         labels.append(f'''
-            <text x="15" y="{height/2}" text-anchor="middle" font-family="Arial" font-size="12" fill="{text_color}" 
+            <text x="15" y="{height/2}" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_labels}" fill="{text_color}" 
                   transform="rotate(-90, 15, {height/2})">Tide Height (m)</text>
         ''')
         
@@ -514,13 +517,13 @@ class TidePlotManager:
 
     def _generate_error_svg(self) -> str:
         """Generate an error SVG when no data is available."""
-        bg_color = '#1e1e1e' if self._dark_mode and not self._transparent_background else ('none' if self._transparent_background else 'white')
+        bg_color = self._colors.get('background', '#1e1e1e' if self._dark_mode else 'white')
         text_color = '#FF5722' if self._dark_mode else 'red'  # Orange for dark mode, red for light
         
         return f'''
         <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
             <rect width="800" height="400" fill="{bg_color}"/>
-            <text x="400" y="200" text-anchor="middle" font-family="Arial" font-size="18" fill="{text_color}">
+            <text x="400" y="200" text-anchor="middle" font-family="{self._font_family}" font-size="18" fill="{text_color}">
                 Could not load tide data
             </text>
         </svg>

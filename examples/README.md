@@ -20,6 +20,7 @@ A collection of ready-to-use Home Assistant dashboard configurations for the Mod
 - **[05-preferred-panel-configuration](05-preferred-panel-configuration/)** - Complete dashboard setup
 - **[08-multiple-stations](08-multiple-stations/)** - Multi-station monitoring
 - **[09-multi-day-plots](09-multi-day-plots/)** ⭐ **NEW** - 1-7 day forecasts with automatic generation
+- **[10-custom-colors](10-custom-colors/)** ⭐ **NEW** - Customize text colors and fonts for better readability
 
 ### Weather Integration
 - **[07-comprehensive-weather-tides](07-comprehensive-weather-tides/)** - Combined weather and tide data
@@ -60,6 +61,7 @@ Example files created:
 | **Dark themes** | [06-dark-mode-visualization](06-dark-mode-visualization/) |
 | **Weather integration** | [07-comprehensive-weather-tides](07-comprehensive-weather-tides/) |
 | **Interactive displays** | [02-picture-elements-overlays](02-picture-elements-overlays/) |
+| **Better readability** | [10-custom-colors](10-custom-colors/) |
 
 ## 📱 Device Compatibility
 
@@ -139,5 +141,6 @@ entities:
 |---------|-------------------|----------|
 | 01-08 | v1.0+ | Basic functionality |
 | 09 | v1.1.4+ | Multi-day plots |
+| 10 | v1.2.0+ | Custom colors and fonts |
 
 All examples are backwards compatible and regularly updated.

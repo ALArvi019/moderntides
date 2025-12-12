@@ -110,13 +110,15 @@ The integration automatically creates **14 camera entities** for each station, g
 
 ### Visual Specifications
 
+All colors and fonts are customizable. See [Custom Colors Example](examples/10-custom-colors/) for details.
+
 #### Light Mode (`camera.STATION_NAME_tide_plot`)
 - **Background**: White (#FFFFFF)
 - **Tide curve**: Cornflower blue (#6495ED)
-- **Fill area**: Light blue with 30% opacity
+- **Fill area**: Light blue (#ADD8E6) with 30% opacity
 - **Grid lines**: Light gray (#D3D3D3)
-- **High tide markers**: Red (#FF0000)
-- **Low tide markers**: Blue (#0000FF)
+- **High tide markers**: Dark red (#CC0000) - improved contrast
+- **Low tide markers**: Dark blue (#0000CC) - improved contrast
 - **Text**: Black (#000000)
 
 #### Dark Mode (`camera.STATION_NAME_tide_plot_dark`)
@@ -145,6 +147,7 @@ Explore our collection of dashboard examples to get the most out of your Modern 
 | [![Comprehensive Weather](examples/07-comprehensive-weather-tides/preview.png)](examples/07-comprehensive-weather-tides/) | **[Comprehensive Weather & Tides](examples/07-comprehensive-weather-tides/)** | Complete weather and tide monitoring dashboard |
 | [![Multiple Stations](examples/08-multiple-stations/preview.png)](examples/08-multiple-stations/) | **[Multiple Stations](examples/08-multiple-stations/)** | Side-by-side comparison dashboard |
 | [![Multi-Day Plots](examples/09-multi-day-plots/preview.png)](examples/09-multi-day-plots/) | **[Multi-Day Plots](examples/09-multi-day-plots/)** | 1-7 day forecasts with automatic generation |
+| | **[Custom Colors](examples/10-custom-colors/)** | Customize text colors and fonts for better readability |
 
 ### Quick Start
 
