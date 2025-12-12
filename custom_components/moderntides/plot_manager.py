@@ -430,6 +430,7 @@ class TidePlotManager:
             ext_label = f"{extreme['height']:.2f}m @ {extreme['time'].strftime('%H:%M')}"
             
             # Different text styling for dark vs light mode
+            # Using stroke with paint-order for text outline effect
             if self._dark_mode:
                 svg_parts.append(f'''
                     <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_labels}" 
@@ -438,9 +439,10 @@ class TidePlotManager:
                     </text>
                 ''')
             else:
+                # Use background color for fill to create contrast against colored stroke
                 svg_parts.append(f'''
                     <text x="{ext_x}" y="{label_y}" text-anchor="middle" font-family="{self._font_family}" font-size="{self._font_size_labels}" 
-                          fill="white" stroke="{color}" stroke-width="3" paint-order="stroke">
+                          fill="{colors["background"]}" stroke="{color}" stroke-width="3" paint-order="stroke">
                         {ext_label}
                     </text>
                 ''')

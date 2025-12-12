@@ -54,6 +54,7 @@ custom_colors = {
     'text': '#000000',            # General text color
     'title': '#000000',           # Title text color
     'axis_text': '#000000',       # Axis label color
+    'error_text': '#CC0000',      # Error message text color
 }
 ```
 
