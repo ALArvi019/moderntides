@@ -33,10 +33,16 @@
     "step": {
       "init": {
         "title": "Modern Tides Options",
-        "description": "Manage your tide stations",
+        "description": "Choose an action",
         "data": {
-          "add_station": "Add new station",
-          "remove_station": "Remove station"
+          "action": "What would you like to do?"
+        }
+      },
+      "select_station": {
+        "title": "Select Station",
+        "description": "Choose a station to modify",
+        "data": {
+          "station_to_modify": "Station"
         }
       },
       "add_station": {
@@ -62,6 +68,23 @@
           "station_name": "Custom Name",
           "update_interval": "Update Interval"
         }
+      },
+      "customize_visuals": {
+        "title": "Customize Colors & Fonts",
+        "description": "Customize the appearance of tide plots",
+        "data": {
+          "light_high_tide": "Light mode: High tide color",
+          "light_low_tide": "Light mode: Low tide color",
+          "light_tide_line": "Light mode: Tide curve color",
+          "light_text": "Light mode: Text color",
+          "dark_high_tide": "Dark mode: High tide color",
+          "dark_low_tide": "Dark mode: Low tide color",
+          "dark_tide_line": "Dark mode: Tide curve color",
+          "dark_text": "Dark mode: Text color",
+          "font_size_title": "Title font size",
+          "font_size_labels": "Labels font size",
+          "font_size_axis": "Axis font size"
+        }
       }
     },
     "error": {
@@ -69,6 +92,10 @@
       "station_exists": "This station is already configured",
       "no_stations": "No stations configured to remove",
       "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "station_modified": "Station settings updated successfully",
+      "no_stations_configured": "No stations configured"
     }
   }
 }

@@ -25,11 +25,24 @@ from .const import (
     CONF_STATION_NAME,
     CONF_STATIONS,
     CONF_UPDATE_INTERVAL,
+    CONF_CUSTOM_COLORS_LIGHT,
+    CONF_CUSTOM_COLORS_DARK,
+    CONF_FONT_SIZE_TITLE,
+    CONF_FONT_SIZE_LABELS,
+    CONF_FONT_SIZE_AXIS,
     DEFAULT_UPDATE_INTERVAL,
+    DEFAULT_COLORS_LIGHT,
+    DEFAULT_COLORS_DARK,
+    DEFAULT_FONT_SIZE_TITLE,
+    DEFAULT_FONT_SIZE_LABELS,
+    DEFAULT_FONT_SIZE_AXIS,
     DOMAIN,
     INTERVALS,
 )
 from .tide_api import TideApiClient
+
+# Color validation regex
+COLOR_REGEX = r'^#[0-9A-Fa-f]{6}$'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -134,37 +147,60 @@ class ModernTidesConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
-        return ModernTidesOptionsFlow(config_entry)
+        return ModernTidesOptionsFlow()
 
 
 class ModernTidesOptionsFlow(config_entries.OptionsFlow):
     """Handle options for the Modern Tides integration."""
 
-    def __init__(self, config_entry):
+    def __init__(self):
         """Initialize options flow."""
-        self.config_entry = config_entry
-        self.options = dict(config_entry.options)
-        self.data = dict(config_entry.data)
-        self.current_station_id = None
+        self._current_station_id = None
+
+    @property
+    def _options(self):
+        """Get current options."""
+        return dict(self.config_entry.options)
+
+    @property
+    def _data(self):
+        """Get current data."""
+        return dict(self.config_entry.data)
 
     async def async_step_init(self, user_input=None):
-        """Manage basic options."""
+        """Manage basic options - show menu."""
+        if user_input is not None:
+            action = user_input.get("action")
+            if action == "modify_station":
+                return await self.async_step_select_station()
+            elif action == "customize_visuals":
+                return await self.async_step_customize_visuals()
+            return self.async_create_entry(title="", data=self._options)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema({
+                vol.Required("action", default="customize_visuals"): vol.In({
+                    "customize_visuals": "Customize colors and fonts",
+                    "modify_station": "Modify station settings",
+                }),
+            }),
+        )
+
+    async def async_step_select_station(self, user_input=None):
+        """Select station to modify."""
         if user_input is not None:
             station_to_modify = user_input.get("station_to_modify")
             if station_to_modify:
-                self.current_station_id = station_to_modify
+                self._current_station_id = station_to_modify
                 return await self.async_step_modify_station()
-                
-            # Si no se seleccionó ninguna estación, simplemente cerrar
-            return self.async_create_entry(title="", data={})
+            return self.async_create_entry(title="", data=self._options)
 
-        current_stations = self.data.get(CONF_STATIONS, [])
-        
+        current_stations = self._data.get(CONF_STATIONS, [])
+
         if not current_stations:
-            # Si no hay estaciones, mostrar mensaje y cerrar
             return self.async_abort(reason="no_stations_configured")
-        
-        # Crear opciones para seleccionar qué estación modificar
+
         station_options = {}
         for station in current_stations:
             station_id = station[CONF_STATION_ID]
@@ -172,7 +208,7 @@ class ModernTidesOptionsFlow(config_entries.OptionsFlow):
             station_options[station_id] = f"{station_name} ({station_id})"
 
         return self.async_show_form(
-            step_id="init",
+            step_id="select_station",
             data_schema=vol.Schema({
                 vol.Required("station_to_modify"): vol.In(station_options),
             }),
@@ -180,12 +216,12 @@ class ModernTidesOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_modify_station(self, user_input=None):
         """Modify an existing station."""
-        station_id = self.current_station_id
-        
+        station_id = self._current_station_id
+
         if user_input is not None:
-            current_data = self.config_entry.data.copy()
+            current_data = dict(self.config_entry.data)
             stations = list(current_data.get(CONF_STATIONS, []))
-            
+
             # Find and update the selected station
             for i, station in enumerate(stations):
                 if station[CONF_STATION_ID] == station_id:
@@ -195,7 +231,7 @@ class ModernTidesOptionsFlow(config_entries.OptionsFlow):
                         CONF_UPDATE_INTERVAL: user_input.get(CONF_UPDATE_INTERVAL),
                     }
                     break
-            
+
             current_data[CONF_STATIONS] = stations
             self.hass.config_entries.async_update_entry(
                 self.config_entry, data=current_data
@@ -203,7 +239,7 @@ class ModernTidesOptionsFlow(config_entries.OptionsFlow):
             return self.async_abort(reason="station_modified")
 
         # Get current station settings
-        current_stations = self.data.get(CONF_STATIONS, [])
+        current_stations = self._data.get(CONF_STATIONS, [])
         station = next((s for s in current_stations if s[CONF_STATION_ID] == station_id), None)
         
         if not station:
@@ -216,5 +252,114 @@ class ModernTidesOptionsFlow(config_entries.OptionsFlow):
                 vol.Required(CONF_UPDATE_INTERVAL, default=station[CONF_UPDATE_INTERVAL]): vol.In(
                     {k: f"{k} ({v} min)" for k, v in INTERVALS.items()}
                 ),
+            }),
+        )
+
+    async def async_step_customize_visuals(self, user_input=None):
+        """Customize colors and fonts for tide plots."""
+        if user_input is not None:
+            # Save color and font settings to options
+            new_options = dict(self._options)
+            new_options[CONF_CUSTOM_COLORS_LIGHT] = {
+                "high_tide": user_input.get("light_high_tide"),
+                "low_tide": user_input.get("light_low_tide"),
+                "tide_line": user_input.get("light_tide_line"),
+                "text": user_input.get("light_text"),
+            }
+            new_options[CONF_CUSTOM_COLORS_DARK] = {
+                "high_tide": user_input.get("dark_high_tide"),
+                "low_tide": user_input.get("dark_low_tide"),
+                "tide_line": user_input.get("dark_tide_line"),
+                "text": user_input.get("dark_text"),
+            }
+            new_options[CONF_FONT_SIZE_TITLE] = user_input.get(CONF_FONT_SIZE_TITLE)
+            new_options[CONF_FONT_SIZE_LABELS] = user_input.get(CONF_FONT_SIZE_LABELS)
+            new_options[CONF_FONT_SIZE_AXIS] = user_input.get(CONF_FONT_SIZE_AXIS)
+
+            return self.async_create_entry(title="", data=new_options)
+
+        # Get current values from options or defaults
+        current_options = self._options
+        light_colors = current_options.get(CONF_CUSTOM_COLORS_LIGHT, {})
+        dark_colors = current_options.get(CONF_CUSTOM_COLORS_DARK, {})
+
+        # Color selector using Home Assistant's color picker
+        from homeassistant.helpers.selector import (
+            ColorRGBSelector,
+            NumberSelector,
+            NumberSelectorConfig,
+            NumberSelectorMode,
+        )
+
+        def hex_to_rgb(hex_color: str) -> list:
+            """Convert hex color to RGB list."""
+            hex_color = hex_color.lstrip('#')
+            return [int(hex_color[i:i+2], 16) for i in (0, 2, 4)]
+
+        def get_color_default(colors_dict: dict, key: str, defaults: dict) -> list:
+            """Get color as RGB list from dict or defaults."""
+            color = colors_dict.get(key, defaults.get(key, "#000000"))
+            # If already a list (RGB), return as-is
+            if isinstance(color, list):
+                return color
+            # Otherwise convert from hex string
+            return hex_to_rgb(color)
+
+        return self.async_show_form(
+            step_id="customize_visuals",
+            data_schema=vol.Schema({
+                # Light mode colors
+                vol.Required(
+                    "light_high_tide",
+                    default=get_color_default(light_colors, "high_tide", DEFAULT_COLORS_LIGHT)
+                ): ColorRGBSelector(),
+                vol.Required(
+                    "light_low_tide",
+                    default=get_color_default(light_colors, "low_tide", DEFAULT_COLORS_LIGHT)
+                ): ColorRGBSelector(),
+                vol.Required(
+                    "light_tide_line",
+                    default=get_color_default(light_colors, "tide_line", DEFAULT_COLORS_LIGHT)
+                ): ColorRGBSelector(),
+                vol.Required(
+                    "light_text",
+                    default=get_color_default(light_colors, "text", DEFAULT_COLORS_LIGHT)
+                ): ColorRGBSelector(),
+                # Dark mode colors
+                vol.Required(
+                    "dark_high_tide",
+                    default=get_color_default(dark_colors, "high_tide", DEFAULT_COLORS_DARK)
+                ): ColorRGBSelector(),
+                vol.Required(
+                    "dark_low_tide",
+                    default=get_color_default(dark_colors, "low_tide", DEFAULT_COLORS_DARK)
+                ): ColorRGBSelector(),
+                vol.Required(
+                    "dark_tide_line",
+                    default=get_color_default(dark_colors, "tide_line", DEFAULT_COLORS_DARK)
+                ): ColorRGBSelector(),
+                vol.Required(
+                    "dark_text",
+                    default=get_color_default(dark_colors, "text", DEFAULT_COLORS_DARK)
+                ): ColorRGBSelector(),
+                # Font sizes
+                vol.Required(
+                    CONF_FONT_SIZE_TITLE,
+                    default=current_options.get(CONF_FONT_SIZE_TITLE, DEFAULT_FONT_SIZE_TITLE)
+                ): NumberSelector(NumberSelectorConfig(
+                    min=10, max=32, step=1, mode=NumberSelectorMode.SLIDER, unit_of_measurement="px"
+                )),
+                vol.Required(
+                    CONF_FONT_SIZE_LABELS,
+                    default=current_options.get(CONF_FONT_SIZE_LABELS, DEFAULT_FONT_SIZE_LABELS)
+                ): NumberSelector(NumberSelectorConfig(
+                    min=8, max=24, step=1, mode=NumberSelectorMode.SLIDER, unit_of_measurement="px"
+                )),
+                vol.Required(
+                    CONF_FONT_SIZE_AXIS,
+                    default=current_options.get(CONF_FONT_SIZE_AXIS, DEFAULT_FONT_SIZE_AXIS)
+                ): NumberSelector(NumberSelectorConfig(
+                    min=6, max=18, step=1, mode=NumberSelectorMode.SLIDER, unit_of_measurement="px"
+                )),
             }),
         )
