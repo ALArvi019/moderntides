@@ -37,6 +37,16 @@ from .const import (
     CONF_STATION_NAME,
     CONF_STATIONS,
     CONF_UPDATE_INTERVAL,
+    CONF_CUSTOM_COLORS_LIGHT,
+    CONF_CUSTOM_COLORS_DARK,
+    CONF_FONT_SIZE_TITLE,
+    CONF_FONT_SIZE_LABELS,
+    CONF_FONT_SIZE_AXIS,
+    DEFAULT_COLORS_LIGHT,
+    DEFAULT_COLORS_DARK,
+    DEFAULT_FONT_SIZE_TITLE,
+    DEFAULT_FONT_SIZE_LABELS,
+    DEFAULT_FONT_SIZE_AXIS,
     DOMAIN,
     INTERVALS,
     PLATFORMS,
@@ -59,6 +69,13 @@ def _install_dependencies():
 
 _install_dependencies()
 
+def _rgb_to_hex(rgb_list) -> str:
+    """Convert RGB list [r, g, b] to hex string #RRGGBB."""
+    if isinstance(rgb_list, list) and len(rgb_list) == 3:
+        return "#{:02x}{:02x}{:02x}".format(rgb_list[0], rgb_list[1], rgb_list[2])
+    return rgb_list  # Return as-is if already a string
+
+
 class TideDataCoordinator(DataUpdateCoordinator):
     """Class to manage fetching tide data."""
 
@@ -66,12 +83,14 @@ class TideDataCoordinator(DataUpdateCoordinator):
         self,
         hass: HomeAssistant,
         station: dict,
+        options: dict = None,
     ):
         """Initialize coordinator."""
         self.station_id = station[CONF_STATION_ID]
         self.station_name = station[CONF_STATION_NAME]
         self.api_client = TideApiClient()
-        
+        options = options or {}
+
         # Convert update interval string to minutes
         update_interval_str = station.get(CONF_UPDATE_INTERVAL, "1h")
         update_interval_min = INTERVALS.get(update_interval_str, 60)
@@ -80,12 +99,32 @@ class TideDataCoordinator(DataUpdateCoordinator):
         _LOGGER.debug("Creating coordinator for station %s (%s) with update interval %s",
                       self.station_name, self.station_id, update_interval)
 
+        # Get custom colors from options (convert RGB lists to hex)
+        custom_colors_light_raw = options.get(CONF_CUSTOM_COLORS_LIGHT, {})
+        custom_colors_dark_raw = options.get(CONF_CUSTOM_COLORS_DARK, {})
+
+        custom_colors_light = {k: _rgb_to_hex(v) for k, v in custom_colors_light_raw.items()} if custom_colors_light_raw else None
+        custom_colors_dark = {k: _rgb_to_hex(v) for k, v in custom_colors_dark_raw.items()} if custom_colors_dark_raw else None
+
+        # Get font sizes from options
+        font_size_title = options.get(CONF_FONT_SIZE_TITLE)
+        font_size_labels = options.get(CONF_FONT_SIZE_LABELS)
+        font_size_axis = options.get(CONF_FONT_SIZE_AXIS)
+
+        # Convert to int if they are floats (from number selector)
+        if font_size_title is not None:
+            font_size_title = int(font_size_title)
+        if font_size_labels is not None:
+            font_size_labels = int(font_size_labels)
+        if font_size_axis is not None:
+            font_size_axis = int(font_size_axis)
+
         # Initialize plot managers for tide charts (light and dark mode) for multiple days
         safe_name = self.station_name.lower().replace(" ", "_").replace("-", "_")
-        
+
         # Create plot managers for each day configuration
         self.plot_managers = {}
-        
+
         for days in PLOT_DAYS_TO_GENERATE:
             # Generate filename suffix based on plot days (maintain compatibility)
             if days == 1:
@@ -93,7 +132,7 @@ class TideDataCoordinator(DataUpdateCoordinator):
                 filename_suffix = ""
             else:
                 filename_suffix = f"_{days}d"
-            
+
             # Light mode plot manager
             plot_filename_light = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot{filename_suffix}.svg")
             light_manager = TidePlotManager(
@@ -101,9 +140,13 @@ class TideDataCoordinator(DataUpdateCoordinator):
                 filename=plot_filename_light,
                 transparent_background=False,
                 dark_mode=False,
-                plot_days=days
+                plot_days=days,
+                custom_colors=custom_colors_light,
+                font_size_title=font_size_title,
+                font_size_labels=font_size_labels,
+                font_size_axis=font_size_axis,
             )
-            
+
             # Dark mode plot manager
             plot_filename_dark = hass.config.path("www", f"{DOMAIN}_{safe_name}_plot{filename_suffix}_dark.svg")
             dark_manager = TidePlotManager(
@@ -111,9 +154,13 @@ class TideDataCoordinator(DataUpdateCoordinator):
                 filename=plot_filename_dark,
                 transparent_background=False,
                 dark_mode=True,
-                plot_days=days
+                plot_days=days,
+                custom_colors=custom_colors_dark,
+                font_size_title=font_size_title,
+                font_size_labels=font_size_labels,
+                font_size_axis=font_size_axis,
             )
-            
+
             self.plot_managers[days] = {
                 'light': light_manager,
                 'dark': dark_manager
@@ -391,14 +438,15 @@ async def async_setup_entry(hass, entry):
     
     # Create a coordinator for each station
     stations = entry.data.get(CONF_STATIONS, [])
+    options = dict(entry.options)
     _LOGGER.debug("Setting up %d stations: %s", len(stations), stations)
-    
+
     for station in stations:
         station_id = station[CONF_STATION_ID]
         station_name = station[CONF_STATION_NAME]
         _LOGGER.debug("Creating coordinator for station %s (%s)", station_id, station_name)
-        
-        coordinator = TideDataCoordinator(hass, station)
+
+        coordinator = TideDataCoordinator(hass, station, options)
         
         # Do initial data update
         try:

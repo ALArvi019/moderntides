@@ -13,6 +13,21 @@ CONF_STATION_ID = "station_id"
 CONF_STATION_NAME = "station_name"
 CONF_UPDATE_INTERVAL = "update_interval"
 
+# Visual customization options
+CONF_CUSTOM_COLORS_LIGHT = "custom_colors_light"
+CONF_CUSTOM_COLORS_DARK = "custom_colors_dark"
+CONF_FONT_SIZE_TITLE = "font_size_title"
+CONF_FONT_SIZE_LABELS = "font_size_labels"
+CONF_FONT_SIZE_AXIS = "font_size_axis"
+
+# Color keys for customization
+COLOR_KEYS = [
+    "high_tide",
+    "low_tide",
+    "tide_line",
+    "text",
+]
+
 # Plot generation settings
 PLOT_DAYS_TO_GENERATE = [1, 2, 3, 4, 5, 6, 7]  # Generate plots for these day ranges
 

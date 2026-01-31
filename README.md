@@ -132,6 +132,18 @@ All colors and fonts are customizable. See [Custom Colors Example](examples/10-c
 
 Both visualizations are generated as scalable SVG files and update automatically with new tide data.
 
+## Customization
+
+You can customize colors and font sizes directly from the Home Assistant UI:
+
+1. Go to **Settings** → **Devices & Services**
+2. Find **Modern Tides** and click **Configure**
+3. Select **Customize colors and fonts**
+4. Adjust colors for light/dark modes and font sizes
+5. Click **Submit**
+
+![Color Customization](images/color-customization.png)
+
 ## Dashboard Examples
 
 Explore our collection of dashboard examples to get the most out of your Modern Tides integration. Each example includes detailed instructions, YAML code, and visual previews.
@@ -147,7 +159,7 @@ Explore our collection of dashboard examples to get the most out of your Modern 
 | [![Comprehensive Weather](examples/07-comprehensive-weather-tides/preview.png)](examples/07-comprehensive-weather-tides/) | **[Comprehensive Weather & Tides](examples/07-comprehensive-weather-tides/)** | Complete weather and tide monitoring dashboard |
 | [![Multiple Stations](examples/08-multiple-stations/preview.png)](examples/08-multiple-stations/) | **[Multiple Stations](examples/08-multiple-stations/)** | Side-by-side comparison dashboard |
 | [![Multi-Day Plots](examples/09-multi-day-plots/preview.png)](examples/09-multi-day-plots/) | **[Multi-Day Plots](examples/09-multi-day-plots/)** | 1-7 day forecasts with automatic generation |
-| | **[Custom Colors](examples/10-custom-colors/)** | Customize text colors and fonts for better readability |
+| | **[Custom Colors](examples/10-custom-colors/)** | Customize colors and fonts from the UI (v1.1.6+) |
 
 ### Quick Start
 
