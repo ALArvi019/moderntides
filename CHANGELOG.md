@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.7 (2026-06-18)
+
+### Fixed
+- **Coordinator timeout**: The data update no longer fails with `TimeoutError`. The 10-second timeout wrapped 8 sequential API calls (7 daily requests + 1 monthly), whose combined time exceeded the limit even when each individual request was fast and the IHM API was healthy. Stations were left without updates and their entities went stale/unavailable.
+
+### Improved
+- **Parallel data fetching**: Daily and monthly tide requests now run concurrently via `asyncio.gather`, reducing the total update time from ~11s to ~5s and adding a comfortable timeout margin (raised to 30s).
+
 ## 1.1.3 (2025-07-06)
 
 ### Added

@@ -3,6 +3,7 @@ Custom component for Modern Tides integration with Home Assistant.
 For more details about this component, please refer to the documentation at
 https://github.com/ALArvi019/moderntides
 """
+import asyncio
 import logging
 from datetime import timedelta
 import os
@@ -176,39 +177,50 @@ class TideDataCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Fetch data from API endpoint."""
         try:
-            async with async_timeout.timeout(10):
+            async with async_timeout.timeout(30):
                 # Get data for the maximum number of days (7 days)
                 max_days = max(PLOT_DAYS_TO_GENERATE)
-                all_daily_data = []
                 base_date = datetime.datetime.now()
-                
-                # Get data for each day
-                for day_offset in range(max_days):
-                    current_date = base_date + datetime.timedelta(days=day_offset)
-                    date_str = current_date.strftime("%Y%m%d")
-                    
-                    daily_data = await self.hass.async_add_executor_job(
-                        self.api_client.get_daily_tides, self.station_id, date_str
+
+                # Build the list of dates to fetch plus the current month
+                date_strs = [
+                    (base_date + datetime.timedelta(days=day_offset)).strftime("%Y%m%d")
+                    for day_offset in range(max_days)
+                ]
+                current_month = datetime.datetime.now().strftime("%Y%m")
+
+                # Fetch every day and the current month concurrently. The requests
+                # are independent, so running them in parallel keeps the total
+                # update time close to a single request instead of the sum of all
+                # of them, which previously could exceed the timeout.
+                daily_results, monthly_data = await asyncio.gather(
+                    asyncio.gather(*[
+                        self.hass.async_add_executor_job(
+                            self.api_client.get_daily_tides, self.station_id, date_str
+                        )
+                        for date_str in date_strs
+                    ]),
+                    self.hass.async_add_executor_job(
+                        self.api_client.get_monthly_tides, self.station_id, current_month
+                    ),
+                )
+
+                # Keep only the days that returned data, preserving order
+                all_daily_data = [
+                    {'date': date_str, 'data': result}
+                    for date_str, result in zip(date_strs, daily_results)
+                    if result
+                ]
+                for entry in all_daily_data:
+                    _LOGGER.debug(
+                        "Got data for station %s, date %s", self.station_id, entry['date']
                     )
-                    
-                    if daily_data:
-                        all_daily_data.append({
-                            'date': date_str,
-                            'data': daily_data
-                        })
-                        _LOGGER.debug("Got data for station %s, date %s", self.station_id, date_str)
-                
+
                 # For backwards compatibility, use the first day as "daily_data"
                 daily_data = all_daily_data[0]['data'] if all_daily_data else {}
-                
+
                 # Log the data structure for debugging
                 _LOGGER.debug("Daily data for station %s: %s", self.station_id, daily_data)
-                
-                # Get current month data for trend analysis
-                current_month = datetime.datetime.now().strftime("%Y%m")
-                monthly_data = await self.hass.async_add_executor_job(
-                    self.api_client.get_monthly_tides, self.station_id, current_month
-                )
                 
                 # Combine data
                 data = {
